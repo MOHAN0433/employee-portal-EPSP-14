@@ -25,7 +25,7 @@ const createEmployee = async (event) => {
         IsSalaryAccount: body.IsSalaryAccount, //required boolean
         IsActive: body.IsActive, //required boolean
         IsDeleted: body.IsDeleted, //required boolean
-      }),
+      }, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
     await db.send(new PutItemCommand(params));
