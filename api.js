@@ -17,6 +17,7 @@ const createEmployee = async (event) => {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
+        bankDetails: body.bankDetails,
         BankName: body.BankName,//give bank object and validate it and set it bankname
         BranchName: body.BranchName,
         BranchAddress: body.BranchAddress,
