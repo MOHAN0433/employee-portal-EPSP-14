@@ -6,10 +6,10 @@ provider:
   stage: dev
   region: ap-south-1
   environment:
-    DYNAMODB_TABLE_NAME: ${self:custom.employeeTable}
+    DYNAMODB_TABLE_NAME: ${self:custom.employee}
 # define a custom variable for dynamodb table name
 custom:
-  employeeTable: employee-table-${self:provider.stage}
+  employee: employee-${self:provider.stage}
 plugins:
   - serverless-iam-roles-per-function
   # lambda function name and configuration
@@ -27,14 +27,14 @@ functions:
       - Effect: "Allow"
         Action:
           - "dynamodb:PutItem"
-        Resource: !GetAtt employeeTable.Arn
+        Resource: !GetAtt employee.Arn
 # aws resource that is dynamodb
 resources:
   Resources:
-    employeeTable:
+    employee:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.employeeTable}
+        TableName: ${self:custom.employee}
         AttributeDefinitions:
           - AttributeName: postId
             AttributeType: S
