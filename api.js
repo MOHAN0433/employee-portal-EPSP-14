@@ -9,7 +9,7 @@ const createEmployee = async (event) => {
     const body = JSON.parse(event.body);
 
     // Check for required fields
-    if (!body.BankName || !body.BranchName || !body.BranchAddress || !body.BankAccountNumber) {
+    if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
       throw new Error('Required fields are missing.');
     }
 
