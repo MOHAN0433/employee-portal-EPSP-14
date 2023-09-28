@@ -17,7 +17,7 @@ const createEmployee = async (event) => {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
-    
+    bankDetails : {
         BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
         BranchName: bankDetails.BranchName,
         BranchAddress: bankDetails.BranchAddress,
@@ -26,7 +26,7 @@ const createEmployee = async (event) => {
         IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
         IsActive: bankDetails.IsActive, //required boolean
         IsDeleted: bankDetails.IsDeleted, //required boolean
-      }, { removeUndefinedValues: true }),  //for remove undefined fields
+      }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
     await db.send(new PutItemCommand(params));
