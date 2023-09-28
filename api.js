@@ -16,7 +16,7 @@ const createEmployee = async (event) => {
     //const id = body.postId;
     const empData = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
-        Key: marshall({ postId: event.body.postId }),
+        Key: marshall({ postId: body.postId }),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
       
