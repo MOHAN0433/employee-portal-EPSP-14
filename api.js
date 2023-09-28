@@ -13,11 +13,22 @@ const createEmployee = async (event) => {
       throw new Error('Required fields are missing.');
     }
 
+    //const id = body.postId;
+    const empData = {
+        TableName: process.env.DYNAMODB_TABLE_NAME,
+        Key: marshall({ postId: event.body.postId }),
+      };
+      const { Item } = await db.send(new GetItemCommand(empData));
+      
+    if (Item) {
+throw new Error("already exists")
+    }
+
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
-    bankDetails : [{
+    bankDetails : {
         BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
         BranchName: bankDetails.BranchName,
         BranchAddress: bankDetails.BranchAddress,
@@ -26,7 +37,7 @@ const createEmployee = async (event) => {
         IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
         IsActive: bankDetails.IsActive, //required boolean
         IsDeleted: bankDetails.IsDeleted, //required boolean
-      }]}, { removeUndefinedValues: true }),  //for remove undefined fields
+      }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
     await db.send(new PutItemCommand(params));
