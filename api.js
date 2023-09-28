@@ -15,15 +15,15 @@ const createEmployee = async (event) => {
     }
 
     //const id = body.postId;
-    const empData = {
-        TableName: process.env.DYNAMODB_TABLE_NAME,
-        Key: marshall({ postId: event.body.postId }),
-      };
-      const { Item } = await db.send(new GetItemCommand(empData));
+//     const empData = {
+//         TableName: process.env.DYNAMODB_TABLE_NAME,
+//         Key: marshall({ postId: event.body.postId }),
+//       };
+//       const { Item } = await db.send(new GetItemCommand(empData));
       
-    if (Item) {
-throw new Error("already exists")
-    }
+//     if (Item) {
+// throw new Error("already exists")
+//     }
 
     const params = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
