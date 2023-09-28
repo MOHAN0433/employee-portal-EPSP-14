@@ -7,7 +7,7 @@ const createEmployee = async (event) => {
   const response = { statusCode: 200 };
   try {
     const body = JSON.parse(event.body);
-
+    const bankDetails= body.bankDetails
     // Check for required fields
     if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
       throw new Error('Required fields are missing.');
@@ -17,15 +17,15 @@ const createEmployee = async (event) => {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
-        bankDetails: body.bankDetails,
-        BankName: body.bankDetails.BankName,//give bank object and validate it and set it bankname
-        BranchName: body.bankDetails.BranchName,
-        BranchAddress: body.bankDetails.BranchAddress,
-        CustomerNumber: body.bankDetails.CustomerNumber,
-        BankAccountNumber: body.bankDetails.BankAccountNumber,
-        IsSalaryAccount: body.bankDetails.IsSalaryAccount, //required boolean
-        IsActive: body.bankDetails.IsActive, //required boolean
-        IsDeleted: body.bankDetails.IsDeleted, //required boolean
+    
+        BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
+        BranchName: bankDetails.BranchName,
+        BranchAddress: bankDetails.BranchAddress,
+        CustomerNumber: bankDetails.CustomerNumber,
+        BankAccountNumber: bankDetails.BankAccountNumber,
+        IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
+        IsActive: bankDetails.IsActive, //required boolean
+        IsDeleted: bankDetails.IsDeleted, //required boolean
       }, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
