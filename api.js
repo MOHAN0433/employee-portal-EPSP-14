@@ -18,14 +18,14 @@ const createEmployee = async (event) => {
       Item: marshall({
         postId: body.postId,
         bankDetails: body.bankDetails,
-        BankName: body.BankName,//give bank object and validate it and set it bankname
-        BranchName: body.BranchName,
-        BranchAddress: body.BranchAddress,
-        CustomerNumber: body.CustomerNumber,
-        BankAccountNumber: body.BankAccountNumber,
-        IsSalaryAccount: body.IsSalaryAccount, //required boolean
-        IsActive: body.IsActive, //required boolean
-        IsDeleted: body.IsDeleted, //required boolean
+        BankName: body.bankDetails.BankName,//give bank object and validate it and set it bankname
+        BranchName: body.bankDetails.BranchName,
+        BranchAddress: body.bankDetails.BranchAddress,
+        CustomerNumber: body.bankDetails.CustomerNumber,
+        BankAccountNumber: body.bankDetails.BankAccountNumber,
+        IsSalaryAccount: body.bankDetails.IsSalaryAccount, //required boolean
+        IsActive: body.bankDetails.IsActive, //required boolean
+        IsDeleted: body.bankDetails.IsDeleted, //required boolean
       }, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
