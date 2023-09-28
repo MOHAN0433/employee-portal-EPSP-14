@@ -4,6 +4,7 @@ const { marshall } = require("@aws-sdk/util-dynamodb");
 const db = new DynamoDBClient({ region: "ap-south-1" });
 
 const createEmployee = async (event) => {
+    const nameRegex = /^[A-Za-z]{3,11}$/;
   const response = { statusCode: 200 };
   try {
     const body = JSON.parse(event.body);
@@ -25,22 +26,31 @@ throw new Error("already exists")
     }
 
     const params = {
-      TableName: process.env.DYNAMODB_TABLE_NAME,
-      Item: marshall({
-        postId: body.postId,
-    bankDetails : {
-        BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
-        BranchName: bankDetails.BranchName,
-        BranchAddress: bankDetails.BranchAddress,
-        CustomerNumber: bankDetails.CustomerNumber,
-        BankAccountNumber: bankDetails.BankAccountNumber,
-        IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
-        IsActive: bankDetails.IsActive, //required boolean
-        IsDeleted: bankDetails.IsDeleted, //required boolean
-      }}, { removeUndefinedValues: true }),  //for remove undefined fields
-    };
+        TableName: process.env.DYNAMODB_TABLE_NAME,
+        Item: marshall(
+          {
+            postId: body.postId,
+            bankDetails: {
+              BankName: bankDetails.BankName,
+              BranchName: bankDetails.BranchName,
+              BranchAddress: bankDetails.BranchAddress,
+              CustomerNumber: bankDetails.CustomerNumber,
+              BankAccountNumber: bankDetails.BankAccountNumber,
+              IsSalaryAccount: bankDetails.IsSalaryAccount,
+              IsActive: bankDetails.IsActive,
+              IsDeleted: bankDetails.IsDeleted,
+            },
+          },
+          { removeUndefinedValues: true }
+        ),
+      };
 
-    await db.send(new PutItemCommand(params));
+    if (!nameRegex.test(bankDetails.BankName)) {
+        // Check if mobileNumber is not 10 digits or contains spaces
+        statusCode = 400;   
+        body = "Invalid username.";
+      }
+    else{await db.send(new PutItemCommand(params));}
     response.body = JSON.stringify({
       message: 'Successfully created post.',
     });
