@@ -1,0 +1,46 @@
+# Api gateway name
+service: employee-bank-details-create-api
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: ap-south-1
+  environment:
+    DYNAMODB_TABLE_NAME: ${self:custom.employeeTable}
+# define a custom variable for dynamodb table name
+custom:
+  employeeTable: employee-table-${self:provider.stage}
+plugins:
+  - serverless-iam-roles-per-function
+  # lambda function name and configuration
+functions:
+  createEmployee:
+    handler: api.createEmployee
+    name: create-employee-bank-details-post
+    memorySize: 128 # mb
+    timeout: 5 # seconds
+    events:
+      - http:
+          path: employee/bankDetails
+          method: POST
+    iamRoleStatements:
+      - Effect: "Allow"
+        Action:
+          - "dynamodb:PutItem"
+        Resource: !GetAtt employeeTable.Arn
+# aws resource that is dynamodb
+resources:
+  Resources:
+    employeeTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.employeeTable}
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
