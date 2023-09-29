@@ -19,12 +19,12 @@ const createEmployee = async (event) => {
     //console.log("Item.bankDetails.BankAccountNumber:", item1.item2.bankDetails.BankAccountNumber);
     //console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);
 
+    if(item1) { 
     if (item1.item2.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
       throw new Error("already exists");
     }
-
     item1.item2.bankDetails.push(bankDetails);
-
+  }
 
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
