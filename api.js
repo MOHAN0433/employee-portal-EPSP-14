@@ -14,16 +14,16 @@ const createEmployee = async (event) => {
       Key: marshall({ postId: body.postId }),
     };
     const { Item } = await db.send(new GetItemCommand(empData));
-    const item1 = unmarshall(Item);
+    const item1 = {item2 : Item ? unmarshall(Item) : {},}
 
-    console.log("Item.bankDetails.BankAccountNumber:", item1.bankDetails.BankAccountNumber);
+    console.log("Item.bankDetails.BankAccountNumber:", item1.item2.bankDetails.BankAccountNumber);
     console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);
 
-    if (item1.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
+    if (item1.item2.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
       throw new Error("already exists");
     }
 
-    item1.bankDetails.push(bankDetails);
+    item1.item2.bankDetails.push(bankDetails);
 
 
     const params = {
