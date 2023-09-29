@@ -27,6 +27,7 @@ functions:
       - Effect: "Allow"
         Action:
           - "dynamodb:PutItem"
+          - "dynamodb:GetItem"
         Resource: !GetAtt employee.Arn
 # aws resource that is dynamodb
 resources:
