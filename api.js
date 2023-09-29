@@ -19,6 +19,9 @@ const createEmployee = async (event) => {
         Key: marshall({ postId: body.postId }),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
+
+      console.log("Item.bankDetails.BankAccountNumber:", Item.bankDetails.BankAccountNumber);
+      console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);  
      
       if (Item.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
         throw new Error("already exists");
