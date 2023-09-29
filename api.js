@@ -23,7 +23,7 @@ const createEmployee = async (event) => {
       console.log("Item.bankDetails.BankAccountNumber:", Item.bankDetails.BankAccountNumber);
       console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);  
      
-      if (Item.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
+      if (Item && Item.bankDetails && Item.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
         throw new Error("already exists");
       }
       
