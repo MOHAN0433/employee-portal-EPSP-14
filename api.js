@@ -17,7 +17,7 @@ const createEmployee = async (event) => {
     const empData = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
         Key: marshall({ BankAccountNumber: bankDetails.BankAccountNumber, 
-          BankName : bankDetails.BranchName}),
+          BankName : bankDetails.BankName}),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
       
