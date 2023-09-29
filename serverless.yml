@@ -28,6 +28,7 @@ functions:
         Action:
           - "dynamodb:PutItem"
           - "dynamodb:GetItem"
+          - "dynamodb:QueryCommand"
         Resource: !GetAtt employee.Arn
 # aws resource that is dynamodb
 resources:

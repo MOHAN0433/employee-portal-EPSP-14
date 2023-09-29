@@ -1,4 +1,4 @@
-const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, PutItemCommand, GetItemCommand, QueryCommand } = require("@aws-sdk/client-dynamodb");
 const { marshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient({ region: "ap-south-1" });
@@ -20,11 +20,8 @@ const createEmployee = async (event) => {
       };
       const { Item } = await db.send(new GetItemCommand(empData));
 
-      console.log("Item.bankDetails.BankAccountNumber:", Item.bankDetails.BankAccountNumber);
-      console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);  
-     
-      if (Item && Item.bankDetails && Item.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
-        throw new Error("already exists");
+      if(Item) {
+        throw new Error("already exists")
       }
       
 
@@ -44,6 +41,10 @@ const createEmployee = async (event) => {
       }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
+    if (await isBankAccountNumberExists(bankDetails.BankAccountNumber)) {
+      throw new Error('BankAccountNumber already exists.');
+    }
+
     await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
       message: 'Successfully created post.',
@@ -59,6 +60,20 @@ const createEmployee = async (event) => {
   }
   return response;
 };
+
+// Function to check if a bankAccountNumber already exists in the database
+async function isBankAccountNumberExists(bankAccountNumber) {
+  const params = {
+    TableName: process.env.DYNAMODB_TABLE_NAME,
+    KeyConditionExpression: "bankDetails.BankAccountNumber = :accountNumber",
+    ExpressionAttributeValues: {
+      ":accountNumber": bankAccountNumber,
+    },
+  };
+
+  const { Count } = await db.send(new QueryCommand(params));
+  return Count > 0;
+}
 
 module.exports = {
   createEmployee
