@@ -21,9 +21,11 @@ const createEmployee = async (event) => {
     const item1 = { item2: Item ? unmarshall(Item) : {} };
 
     // Initialize bankDetails as an array if it's not present
-    if (!item1.item2.bankDetails) {
-      item1.item2.bankDetails = [];
-    }
+    // Initialize bankDetails as an array if it's not present or not an array
+if (!item1.item2.bankDetails || !Array.isArray(item1.item2.bankDetails)) {
+  item1.item2.bankDetails = [];
+}
+
 
     // Check if bankDetails.BankAccountNumber already exists
     const isBankAccountExisting = item1.item2.bankDetails.some((existingBank) => existingBank.BankAccountNumber === bankDetails.BankAccountNumber);
