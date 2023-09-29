@@ -16,11 +16,9 @@ const createEmployee = async (event) => {
     const { Item } = await db.send(new GetItemCommand(empData));
     const item1 = {item2 : Item ? unmarshall(Item) : {},}
 
-    //console.log("Item.bankDetails.BankAccountNumber:", item1.item2.bankDetails.BankAccountNumber);
-    //console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);
 
     if(item1) { 
-    if (item1.item2.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
+    if (item1.item2.bankDetails.BankAccountNumber == bankDetails.BankAccountNumber) {
       throw new Error("already exists");
     }
     item1.item2.bankDetails.push(bankDetails);
