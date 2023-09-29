@@ -1,5 +1,5 @@
 const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
-const { marshall } = require("@aws-sdk/util-dynamodb");
+const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient({ region: "ap-south-1" });
 
@@ -19,7 +19,7 @@ const createEmployee = async (event) => {
         Key: marshall({ postId: body.postId }),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
-      const item1 = Item ? unmarshall(Item) : {};
+      const item1 =  unmarshall(Item); 
 
       console.log("Item.bankDetails.BankAccountNumber:", item1.bankDetails.BankAccountNumber);
       console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);  
