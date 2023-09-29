@@ -20,7 +20,7 @@ const createEmployee = async (event) => {
       };
       const { Item } = await db.send(new GetItemCommand(empData));
      
-      if (Item.bankDetails && Item.bankDetails.BankAccountNumber) {
+      if (!Item.bankDetails && !Item.bankDetails.BankAccountNumber) {
         throw new Error("already exists");
       }
       
