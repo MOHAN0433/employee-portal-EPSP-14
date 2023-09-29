@@ -1,4 +1,4 @@
-const { DynamoDBClient, PutItemCommand, GetItemCommand, QueryCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
 const { marshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient({ region: "ap-south-1" });
@@ -14,15 +14,19 @@ const createEmployee = async (event) => {
     // }
 
     //const id = body.postId;
-    // const empData = {
-    //     TableName: process.env.DYNAMODB_TABLE_NAME,
-    //     Key: marshall({ postId: body.postId }),
-    //   };
-    //   const { Item } = await db.send(new GetItemCommand(empData));
+    const empData = {
+        TableName: process.env.DYNAMODB_TABLE_NAME,
+        Key: marshall({ postId: body.postId }),
+      };
+      const { Item } = await db.send(new GetItemCommand(empData));
+      const item1 = Item ? unmarshall(Item) : {};
 
-    //   if(Item) {
-    //     throw new Error("already exists")
-    //   }
+      console.log("Item.bankDetails.BankAccountNumber:", item1.bankDetails.BankAccountNumber);
+      console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);  
+     
+      if (item1.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
+        throw new Error("already exists");
+      }
       
 
     const params = {
@@ -41,10 +45,6 @@ const createEmployee = async (event) => {
       }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
-    if (await isBankAccountNumberExists(bankDetails.BankAccountNumber)) {
-      throw new Error('BankAccountNumber already exists.');
-    }
-
     await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
       message: 'Successfully created post.',
@@ -60,20 +60,6 @@ const createEmployee = async (event) => {
   }
   return response;
 };
-
-// Function to check if a bankAccountNumber already exists in the database
-async function isBankAccountNumberExists(bankAccountNumber) {
-  const params = {
-    TableName: process.env.DYNAMODB_TABLE_NAME,
-    KeyConditionExpression: "bankDetails.BankAccountNumber = :accountNumber",
-    ExpressionAttributeValues: {
-      ":accountNumber": bankAccountNumber,
-    },
-  };
-
-  const { Count } = await db.send(new QueryCommand(params));
-  return Count > 0;
-}
 
 module.exports = {
   createEmployee
