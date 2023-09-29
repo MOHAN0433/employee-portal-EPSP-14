@@ -7,42 +7,40 @@ const createEmployee = async (event) => {
   const response = { statusCode: 200 };
   try {
     const body = JSON.parse(event.body);
-    const bankDetails= body.bankDetails
-    // Check for required fields
-    // if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
-    //   throw new Error('Required fields are missing.');
-    // }
-
-    //const id = body.postId;
+    const bankDetails = body.bankDetails
+    
     const empData = {
-        TableName: process.env.DYNAMODB_TABLE_NAME,
-        Key: marshall({ postId: body.postId }),
-      };
-      const { Item } = await db.send(new GetItemCommand(empData));
-      const item1 =  unmarshall(Item); 
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Key: marshall({ postId: body.postId }),
+    };
+    const { Item } = await db.send(new GetItemCommand(empData));
+    const item1 = unmarshall(Item);
 
-      console.log("Item.bankDetails.BankAccountNumber:", item1.bankDetails.BankAccountNumber);
-      console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);  
-     
-      if (item1.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
-        throw new Error("already exists");
-      }
-      
+    console.log("Item.bankDetails.BankAccountNumber:", item1.bankDetails.BankAccountNumber);
+    console.log("bankDetails.BankAccountNumber:", bankDetails.BankAccountNumber);
+
+    if (item1.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
+      throw new Error("already exists");
+    }
+
+    item1.bankDetails.push(bankDetails);
+
 
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
-    bankDetails : {
-        BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
-        BranchName: bankDetails.BranchName,
-        BranchAddress: bankDetails.BranchAddress,
-        CustomerNumber: bankDetails.CustomerNumber,
-        BankAccountNumber: bankDetails.BankAccountNumber,
-        IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
-        IsActive: bankDetails.IsActive, //required boolean
-        IsDeleted: bankDetails.IsDeleted, //required boolean
-      }}, { removeUndefinedValues: true }),  //for remove undefined fields
+        bankDetails: {
+          BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
+          BranchName: bankDetails.BranchName,
+          BranchAddress: bankDetails.BranchAddress,
+          CustomerNumber: bankDetails.CustomerNumber,
+          BankAccountNumber: bankDetails.BankAccountNumber,
+          IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
+          IsActive: bankDetails.IsActive, //required boolean
+          IsDeleted: bankDetails.IsDeleted, //required boolean
+        }
+      }, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
     await db.send(new PutItemCommand(params));
