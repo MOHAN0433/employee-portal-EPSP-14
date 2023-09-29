@@ -20,14 +20,15 @@ const createEmployee = async (event) => {
     const { Item } = await db.send(new GetItemCommand(empData));
     const item1 = { item2: Item ? unmarshall(Item) : {} };
 
-    // Check if bankDetails.BankAccountNumber already exists
-    if (item1.item2.bankDetails && item1.item2.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber) {
-      throw new Error("BankAccountNumber already exists");
-    }
-
     // Initialize bankDetails as an array if it's not present
     if (!item1.item2.bankDetails) {
       item1.item2.bankDetails = [];
+    }
+
+    // Check if bankDetails.BankAccountNumber already exists
+    const isBankAccountExisting = item1.item2.bankDetails.some((existingBank) => existingBank.BankAccountNumber === bankDetails.BankAccountNumber);
+    if (isBankAccountExisting) {
+      throw new Error("BankAccountNumber already exists");
     }
 
     // Push bankDetails into the array
@@ -37,16 +38,7 @@ const createEmployee = async (event) => {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
-        bankDetails: {
-          BankName: bankDetails.BankName,
-          BranchName: bankDetails.BranchName,
-          BranchAddress: bankDetails.BranchAddress,
-          CustomerNumber: bankDetails.CustomerNumber,
-          BankAccountNumber: bankDetails.BankAccountNumber,
-          IsSalaryAccount: bankDetails.IsSalaryAccount,
-          IsActive: bankDetails.IsActive,
-          IsDeleted: bankDetails.IsDeleted,
-        }
+        bankDetails: item1.item2.bankDetails, // Store the updated array
       }, { removeUndefinedValues: true }),
     };
 
