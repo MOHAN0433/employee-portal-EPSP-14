@@ -16,11 +16,11 @@ const createEmployee = async (event) => {
     //const id = body.postId;
     const empData = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
-        Key: marshall({ BankAccountNumber: bankDetails.BankAccountNumber}),
+        Key: marshall({ postId: body.postId }),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
-      
-    if (Item) {
+      const { bankData } = Item.bankDetails;
+    if (bankData) {
 throw new Error("already exists")
     }
 
@@ -37,7 +37,7 @@ throw new Error("already exists")
         IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
         IsActive: bankDetails.IsActive, //required boolean
         IsDeleted: bankDetails.IsDeleted, //required boolean
-      }}, { removeUndefinedValues: true }), //for remove undefined fields
+      }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
     await db.send(new PutItemCommand(params));
