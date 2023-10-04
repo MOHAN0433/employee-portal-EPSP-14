@@ -20,7 +20,6 @@ const createEmployee = async (event) => {
     const { Item } = await db.send(new GetItemCommand(empData));
     const item1 = { item2: Item ? unmarshall(Item) : {} };
 
-    // Initialize bankDetails as an array if it's not present
     // Initialize bankDetails as an array if it's not present or not an array
 if (!item1.item2.bankDetails || !Array.isArray(item1.item2.bankDetails)) {
   item1.item2.bankDetails = [];
@@ -40,8 +39,17 @@ if (!item1.item2.bankDetails || !Array.isArray(item1.item2.bankDetails)) {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
-        bankDetails: item1.item2.bankDetails, // Store the updated array
-      }, { removeUndefinedValues: true }),
+        //bankDetails: item1.item2.bankDetails, // Store the updated array
+        bankDetails : {
+          BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
+          BranchName: bankDetails.BranchName,
+          BranchAddress: bankDetails.BranchAddress,
+          CustomerNumber: bankDetails.CustomerNumber,
+          BankAccountNumber: bankDetails.BankAccountNumber,
+          IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
+          IsActive: bankDetails.IsActive, //required boolean
+          IsDeleted: bankDetails.IsDeleted, //required boolean
+        }}, { removeUndefinedValues: true }),
     };
 
     await db.send(new PutItemCommand(params));
