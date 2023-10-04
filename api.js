@@ -11,24 +11,19 @@ const validation = async (bankDetails) => {
   // const body = JSON.parse(event.body);
   //   const bankDetails= body.bankDetails
   if (!nameRegex.test(bankDetails.BankName)) {
-    statusCode = 400;   
-    body = "BankName should be minimum 3 charecters!";
+    throw new Error("BankName should be minimum 3 charecters!")
   }
   if (!nameRegex.test(bankDetails.BranchName)) {
-    statusCode = 400;   
-    body = "BranchName should be minimum 3 charecters!";
+    throw new Error("BranchName should be minimum 3 charecters!");
   }
   if (!nameRegex.test(bankDetails.BranchAddress)) {
-    statusCode = 400;   
-    body = "BranchAddress should be minimum 3 charecters!";
+    throw new Error("BranchAddress should be minimum 3 charecters!");
   }
   if (!CustomerNumberRegex.test(bankDetails.CustomerNumber)) {
-    statusCode = 400;   
-    body = "CustomerNumber should be minimum 11 charecters!";
+    throw new Error("CustomerNumber should be minimum 3 charecters!");
   }
   if (!BankAccountNumber.test(bankDetails.BankAccountNumber)) {
-    statusCode = 400;   
-    body = "BankAccountNumber should be minimum 11 digits!";
+    throw new Error("BankAccountNumber should be minimum 3 charecters!");
   }
 }
 
