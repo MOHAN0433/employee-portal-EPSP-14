@@ -22,11 +22,11 @@ const createEmployee = async (event) => {
     
       const item1 = { item2: Item ? unmarshall(Item) : {} };
 
-      if(item1){
-      const isBankAccountExisting = item1.item2.bankDetails.some((existingBank) => existingBank.BankAccountNumber === bankDetails.BankAccountNumber);
-    if (isBankAccountExisting) {
+      if(item1.BankAccountNumber === bankDetails.BankAccountNumber){
+    //   const isBankAccountExisting = item1.item2.bankDetails.some((existingBank) => existingBank.BankAccountNumber === bankDetails.BankAccountNumber);
+    // if (isBankAccountExisting) {
       throw new Error("BankAccountNumber already exists");
-    }
+   // }
   }
       
 
