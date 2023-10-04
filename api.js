@@ -19,12 +19,15 @@ const createEmployee = async (event) => {
         Key: marshall({ postId: body.postId }),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
+    
       const item1 = { item2: Item ? unmarshall(Item) : {} };
 
+      if(item1){
       const isBankAccountExisting = item1.item2.bankDetails.some((existingBank) => existingBank.BankAccountNumber === bankDetails.BankAccountNumber);
     if (isBankAccountExisting) {
       throw new Error("BankAccountNumber already exists");
     }
+  }
       
 
     const params = {
