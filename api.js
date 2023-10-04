@@ -1,76 +1,60 @@
 const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
-const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
+const { marshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient({ region: "ap-south-1" });
 
 const createEmployee = async (event) => {
+  const response = { statusCode: 200 };
   try {
     const body = JSON.parse(event.body);
-    const bankDetails = body.bankDetails;
+    const bankDetails= body.bankDetails
+    // Check for required fields
+    // if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
+    //   throw new Error('Required fields are missing.');
+    // }
 
-    // Check if bankDetails is defined
-    if (!bankDetails) {
-      throw new Error("bankDetails is missing in the request body");
-    }
-
+    //const id = body.postId;
     const empData = {
-      TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: body.postId }),
-    };
-    const { Item } = await db.send(new GetItemCommand(empData));
-    const item1 = { item2: Item ? unmarshall(Item) : {} };
+        TableName: process.env.DYNAMODB_TABLE_NAME,
+        Key: marshall({ postId: body.postId }),
+      };
+      const { Item } = await db.send(new GetItemCommand(empData));
 
-    // Initialize bankDetails as an array if it's not present or not an array
-if (!item1.item2.bankDetails || !Array.isArray(item1.item2.bankDetails)) {
-  item1.item2.bankDetails = [];
-}
-
-
-    // Check if bankDetails.BankAccountNumber already exists
-    const isBankAccountExisting = item1.item2.bankDetails.some((existingBank) => existingBank.BankAccountNumber === bankDetails.BankAccountNumber);
-    if (isBankAccountExisting) {
-      throw new Error("BankAccountNumber already exists");
-    }
-
-    // Push bankDetails into the array
-    item1.item2.bankDetails.push(bankDetails);
+      if(Item) {
+        throw new Error("already exists")
+      }
+      
 
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
         postId: body.postId,
-        //bankDetails: item1.item2.bankDetails, // Store the updated array
-        bankDetails : {
-          BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
-          BranchName: bankDetails.BranchName,
-          BranchAddress: bankDetails.BranchAddress,
-          CustomerNumber: bankDetails.CustomerNumber,
-          BankAccountNumber: bankDetails.BankAccountNumber,
-          IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
-          IsActive: bankDetails.IsActive, //required boolean
-          IsDeleted: bankDetails.IsDeleted, //required boolean
-        }}, { removeUndefinedValues: true }),
+    bankDetails : {
+        BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
+        BranchName: bankDetails.BranchName,
+        BranchAddress: bankDetails.BranchAddress,
+        CustomerNumber: bankDetails.CustomerNumber,
+        BankAccountNumber: bankDetails.BankAccountNumber,
+        IsSalaryAccount: bankDetails.IsSalaryAccount, //required boolean
+        IsActive: bankDetails.IsActive, //required boolean
+        IsDeleted: bankDetails.IsDeleted, //required boolean
+      }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
     await db.send(new PutItemCommand(params));
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: 'Successfully created post.',
-      }),
-    };
+    response.body = JSON.stringify({
+      message: 'Successfully created post.',
+    });
   } catch (e) {
     console.error(e);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({
-        message: 'Failed to create post.',
-        errorMsg: e.message,
-        errorStack: e.stack,
-      }),
-    };
+    response.statusCode = 500;
+    response.body = JSON.stringify({
+      message: 'Failed to create post.',
+      errorMsg: e.message,
+      errorStack: e.stack,
+    });
   }
+  return response;
 };
 
 module.exports = {
