@@ -122,7 +122,6 @@ const updateEmployee = async (event) => {
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Item: marshall({
-        postId: body.postId,
     bankDetails : {
         BankName: bankDetails.BankName,//give bank object and validate it and set it bankname
         BranchName: bankDetails.BranchName,
