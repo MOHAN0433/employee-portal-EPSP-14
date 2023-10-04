@@ -37,7 +37,7 @@ functions:
     events:
       - http:
           path: employee/bankDetails/{postId}
-          method: POST
+          method: PUT
     iamRoleStatements:
       - Effect: "Allow"
         Action:
