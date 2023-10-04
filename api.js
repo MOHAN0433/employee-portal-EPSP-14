@@ -7,24 +7,23 @@ const nameRegex = /^[A-Za-z]{3,32}$/;
 const CustomerNumberRegex = /^\d{11}$/;
 const BankAccountNumber = /^\d{11,16}$/;
 
-const validation = async (bankDetails) => {
-  // const body = JSON.parse(event.body);
-  //   const bankDetails= body.bankDetails
+const validation = (bankDetails) => {
   if (!nameRegex.test(bankDetails.BankName)) {
-    throw new Error("BankName should be minimum 3 charecters!")
+    return "BankName should be minimum 3 characters!";
   }
   if (!nameRegex.test(bankDetails.BranchName)) {
-    throw new Error("BranchName should be minimum 3 charecters!");
+    return "BranchName should be minimum 3 characters!";
   }
   if (!nameRegex.test(bankDetails.BranchAddress)) {
-    throw new Error("BranchAddress should be minimum 3 charecters!");
+    return "BranchAddress should be minimum 3 characters!";
   }
   if (!CustomerNumberRegex.test(bankDetails.CustomerNumber)) {
-    throw new Error("CustomerNumber should be minimum 3 charecters!");
+    return "CustomerNumber should be minimum 11 characters!";
   }
   if (!BankAccountNumber.test(bankDetails.BankAccountNumber)) {
-    throw new Error("BankAccountNumber should be minimum 3 charecters!");
+    return "BankAccountNumber should be minimum 11 digits!";
   }
+  return null; // Validation passed
 }
 
 const createEmployee = async (event) => {
@@ -32,7 +31,10 @@ const createEmployee = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const bankDetails= body.bankDetails
-    validation(bankDetails);
+    const validationError = validation(bankDetails);
+    if (validationError) {
+      throw new Error(validationError);
+    }
     // Check for required fields
     // if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
     //   throw new Error('Required fields are missing.');
