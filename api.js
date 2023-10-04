@@ -1,5 +1,5 @@
 const { DynamoDBClient, PutItemCommand, GetItemCommand } = require("@aws-sdk/client-dynamodb");
-const { marshall } = require("@aws-sdk/util-dynamodb");
+const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient({ region: "ap-south-1" });
 
@@ -19,10 +19,12 @@ const createEmployee = async (event) => {
         Key: marshall({ postId: body.postId }),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
+      const item1 = { item2: Item ? unmarshall(Item) : {} };
 
-      if(Item) {
-        throw new Error("already exists")
-      }
+      const isBankAccountExisting = item1.item2.bankDetails.some((existingBank) => existingBank.BankAccountNumber === bankDetails.BankAccountNumber);
+    if (isBankAccountExisting) {
+      throw new Error("BankAccountNumber already exists");
+    }
       
 
     const params = {
