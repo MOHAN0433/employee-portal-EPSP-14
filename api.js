@@ -19,7 +19,7 @@ const createEmployee = async (event) => {
         Key: marshall({ postId: body.postId }),
       };
       const { Item } = await db.send(new GetItemCommand(empData));
-      const item1 = { item2: Item ? unmarshall(Item) : {} };
+      const item1 = { item2: Item ? unmarshall(Item) : undefined };
 
       console.log(item1);
       if(item1) {
