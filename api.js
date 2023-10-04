@@ -7,7 +7,9 @@ const nameRegex = /^[A-Za-z]{3,32}$/;
 const CustomerNumberRegex = /^\d{11}$/;
 const BankAccountNumber = /^\d{11,16}$/;
 
-const validation = async (validate) => {
+const validation = async (bankDetails) => {
+  // const body = JSON.parse(event.body);
+  //   const bankDetails= body.bankDetails
   if (!nameRegex.test(bankDetails.BankName)) {
     statusCode = 400;   
     body = "BankName should be minimum 3 charecters!";
@@ -72,7 +74,7 @@ const createEmployee = async (event) => {
       }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
-    validation();
+    validation(bankDetails);
 
     await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
