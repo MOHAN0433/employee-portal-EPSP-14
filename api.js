@@ -3,6 +3,33 @@ const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 
 const db = new DynamoDBClient({ region: "ap-south-1" });
 
+const nameRegex = /^[A-Za-z]{3,32}$/;
+const CustomerNumberRegex = /^\d{11}$/;
+const BankAccountNumber = /^\d{11,16}$/;
+
+const validation = async (validate) => {
+  if (!nameRegex.test(bankDetails.BankName)) {
+    statusCode = 400;   
+    body = "BankName should be minimum 3 charecters!";
+  }
+  if (!nameRegex.test(bankDetails.BranchName)) {
+    statusCode = 400;   
+    body = "BranchName should be minimum 3 charecters!";
+  }
+  if (!nameRegex.test(bankDetails.BranchAddress)) {
+    statusCode = 400;   
+    body = "BranchAddress should be minimum 3 charecters!";
+  }
+  if (!CustomerNumberRegex.test(bankDetails.CustomerNumber)) {
+    statusCode = 400;   
+    body = "CustomerNumber should be minimum 11 charecters!";
+  }
+  if (!BankAccountNumber.test(bankDetails.BankAccountNumber)) {
+    statusCode = 400;   
+    body = "BankAccountNumber should be minimum 11 digits!";
+  }
+}
+
 const createEmployee = async (event) => {
   const response = { statusCode: 200 };
   try {
@@ -21,13 +48,11 @@ const createEmployee = async (event) => {
       const { Item } = await db.send(new GetItemCommand(empData));
       if (Item) {
       const item1 = { item2: Item ? unmarshall(Item) : {} };
-
       console.log(item1);
-      if(item1) {
+      
       if(item1.item2.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber){
       throw new Error("BankAccountNumber already exists");
     }
-  }
 }
       
 
@@ -46,6 +71,8 @@ const createEmployee = async (event) => {
         IsDeleted: bankDetails.IsDeleted, //required boolean
       }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
+
+    validation();
 
     await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
