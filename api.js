@@ -37,6 +37,7 @@ const createEmployee = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const bankDetails= body.bankDetails
+    validation(bankDetails);
     // Check for required fields
     // if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
     //   throw new Error('Required fields are missing.');
@@ -74,7 +75,7 @@ const createEmployee = async (event) => {
       }}, { removeUndefinedValues: true }),  //for remove undefined fields
     };
 
-    validation(bankDetails);
+    
 
     await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
