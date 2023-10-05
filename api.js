@@ -95,7 +95,10 @@ const updateEmployee = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const objKeys = Object.keys(body);
-    //const validationError = validation(body);
+    const validationError = validation(bankDetails);
+    if (validationError) {
+      throw new Error(validationError);
+    }
     
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
@@ -122,13 +125,13 @@ const updateEmployee = async (event) => {
     };
     const updateResult = await db.send(new UpdateItemCommand(params));
     response.body = JSON.stringify({
-      message: 'Successfully updated post.',
+      message: 'Successfully updated BankDeatils.',
       updateResult,
     });
   } catch (e) {
     console.error(e);
     response.body = JSON.stringify({
-      message: 'Failed to update post.',
+      message: 'Failed to update BankDeatils.',
       errorMsg: e.message,
       errorStack: e.stack,
     });
