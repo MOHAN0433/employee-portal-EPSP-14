@@ -41,16 +41,17 @@ const createEmployee = async (event) => {
     }
 
     //const id = body.postId;
-    const empData = {
+    const employeeData = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
         Key: marshall({ postId: body.postId }),
       };
-      const { Item } = await db.send(new GetItemCommand(empData));
+      const { Item } = await db.send(new GetItemCommand(employeeData));
       if (Item) {
       const item1 = { item2: Item ? unmarshall(Item) : {} };
       console.log(item1);
       
-      if(item1.item2.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber || item1.item2.bankDetails.BankName === bankDetails.BankName){
+      //if(item1.item2.bankDetails.BankAccountNumber === bankDetails.BankAccountNumber || item1.item2.bankDetails.BankName === bankDetails.BankName){
+      if (item1.item2.bankDetails) {
       throw new Error("BankDetails already exists!");
     }
 }
