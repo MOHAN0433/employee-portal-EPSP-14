@@ -95,7 +95,7 @@ const updateEmployee = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const objKeys = Object.keys(body);
-    const validationError = validation(bankDetails);
+    const validationError = validation(objKeys);
     if (validationError) {
       throw new Error(validationError);
     }
