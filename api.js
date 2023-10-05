@@ -4,7 +4,7 @@ const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 const db = new DynamoDBClient({ region: "ap-south-1" });
 
 const nameRegex = /^[A-Za-z]{3,32}$/;
-const CustomerNumberRegex = /^\d{11}$/;
+const CustomerNumberRegex = /^\d{11,12}$/;
 const BankAccountNumber = /^\d{11,16}$/;
 
 const validation = (bankDetails) => {
