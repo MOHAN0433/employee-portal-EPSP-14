@@ -1,3 +1,4 @@
+
 const { DynamoDBClient, PutItemCommand, GetItemCommand, UpdateItemCommand } = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 
@@ -95,10 +96,10 @@ const updateEmployee = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const objKeys = Object.keys(body);
-    // const validationError = validation(objKeys);
-    // if (validationError) {
-    //   throw new Error(validationError);
-    // }
+    const validationError = validation(body.bankDetails);
+    if (validationError) {
+      throw new Error(validationError);
+    }
     
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
