@@ -81,7 +81,6 @@ const createEmployee = async (event) => {
     });
   } catch (e) {
     console.error(e);
-    response.statusCode = 500;
     response.body = JSON.stringify({
       message: 'Failed to create post.',
       errorMsg: e.message,
@@ -97,9 +96,7 @@ const updateEmployee = async (event) => {
     const body = JSON.parse(event.body);
     const objKeys = Object.keys(body);
     const validationError = validation(body);
-    if (validationError) {
-      throw new Error(validationError);
-    }
+    
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Key: marshall({ postId: event.pathParameters.postId }),
@@ -130,7 +127,6 @@ const updateEmployee = async (event) => {
     });
   } catch (e) {
     console.error(e);
-    response.statusCode = 500;
     response.body = JSON.stringify({
       message: 'Failed to update post.',
       errorMsg: e.message,
