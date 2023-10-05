@@ -95,7 +95,7 @@ const updateEmployee = async (event) => {
   try {
     const body = JSON.parse(event.body);
     const objKeys = Object.keys(body);
-    const validationError = validation(body);
+    //const validationError = validation(body);
     
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
