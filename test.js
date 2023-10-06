@@ -56,23 +56,23 @@ describe('createEmployee unit tests', () => {
       let event = {
         body: JSON.stringify(createEmployeeData),
       };
-  
+    
       const response = await createEmployee(event);
       expect(response.statusCode).to.equal(200);
       const responseBody = JSON.parse(response.body);
-      expect(responseBody.message).to.equal('Successfully created post.'); // Correct the message if necessary
+      expect(responseBody.message).to.equal('Successfully created post.');
     });
-  
+    
     it('fails to create an employee with missing data', async () => {
       // Mock event object with missing data
       let event = {
         body: JSON.stringify({}), // Missing required data
       };
-  
+    
       const response = await createEmployee(event);
-      expect(response.statusCode).to.equal(500); // Expecting an error response
+      expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for missing data
     });
-  
+    
     it('fails to create an employee with invalid data', async () => {
       // Mock event object with invalid data
       let event = {
@@ -81,11 +81,11 @@ describe('createEmployee unit tests', () => {
           BankName: 'AB', // Too short
         }),
       };
-  
+    
       const response = await createEmployee(event);
-      expect(response.statusCode).to.equal(500); // Expecting an error response
+      expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for invalid data
     });
-  });
+    
   
   // Successfully update an employee
   describe('updateEmployee unit tests', () => {
@@ -108,13 +108,13 @@ describe('createEmployee unit tests', () => {
         },
         body: JSON.stringify(updateEmployeeData),
       };
-  
+    
       const response = await updateEmployee(event);
       expect(response.statusCode).to.equal(200);
       const responseBody = JSON.parse(response.body);
-      expect(responseBody.message).to.equal('Successfully updated post.'); // Correct the message if necessary
+      expect(responseBody.message).to.equal('Successfully updated BankDetails.'); // Update the message if necessary
     });
-  
+    
     it('fails to update an employee with invalid data', async () => {
       // Mock event object with invalid data
       let event = {
@@ -126,9 +126,10 @@ describe('createEmployee unit tests', () => {
           BankName: 'a', // Too short
         }),
       };
-  
+    
       const response = await updateEmployee(event);
-      expect(response.statusCode).to.equal(500); // Expecting an error response
+      expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for invalid data
     });
+    
   });
   
