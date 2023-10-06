@@ -39,8 +39,7 @@ const createEmployee = async (event) => {
     const bankDetails = body.bankDetails;
     
     // Perform validation on bankDetails
-    const validationError = validation(bankDetails);
-    console.log(validationError);
+    const validationError = validation(body.bankDetails);
     if (validationError) {
       throw new Error(validationError);
     }
