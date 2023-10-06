@@ -156,12 +156,20 @@ const updateEmployee = async (event) => {
           IsDeleted: bankDetails.IsDeleted,
         }, { removeUndefinedValues: true }),
       },
+      ReturnValues: 'ALL_NEW', // Optionally, you can specify this if you want to get the updated item
     };
-
+    
     // Update the item in DynamoDB
-    await db.send(new UpdateItemCommand(params));
+    const updatedItem = await db.send(new UpdateItemCommand(params));
+    
+    // Check if the item was successfully updated
+    if (!updatedItem || !updatedItem.Attributes) {
+      throw new Error('Failed to update the item.');
+    }
+    
     response.body = JSON.stringify({
       message: 'Successfully updated post.',
+      updatedItem: unmarshall(updatedItem.Attributes), // Optionally, you can return the updated item
     });
   } catch (e) {
     console.error(e);
