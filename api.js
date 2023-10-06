@@ -123,7 +123,7 @@ const updateEmployee = async (event) => {
     }
 
     // Check for required fields in the body
-    if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
+    if (!bankDetails.BankName || !bankDetails.BranchName || !bankDetails.BranchAddress || !bankDetails.BankAccountNumber) {
       throw new Error('Required fields are missing.');
     }
 
@@ -139,22 +139,19 @@ const updateEmployee = async (event) => {
       throw new Error(`Item with postId ${postId} not found.`);
     }
 
+    // Merge the existing bankDetails with the new data, preserving any additional properties
+    const updatedBankDetails = {
+      ...unmarshall(Item.bankDetails), // Get existing data
+      ...bankDetails, // Merge with new data
+    };
+
     // Define parameters for updating an item in DynamoDB
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Key: marshall({ postId: postId }),
       UpdateExpression: 'SET bankDetails = :bankDetails',
       ExpressionAttributeValues: {
-        ':bankDetails': marshall({
-          BankName: bankDetails.BankName,
-          BranchName: bankDetails.BranchName,
-          BranchAddress: bankDetails.BranchAddress,
-          CustomerNumber: bankDetails.CustomerNumber,
-          BankAccountNumber: bankDetails.BankAccountNumber,
-          IsSalaryAccount: bankDetails.IsSalaryAccount,
-          IsActive: bankDetails.IsActive,
-          IsDeleted: bankDetails.IsDeleted,
-        }, { removeUndefinedValues: true }),
+        ':bankDetails': marshall(updatedBankDetails, { removeUndefinedValues: true }),
       },
       ReturnValues: 'ALL_NEW', // Optionally, you can specify this if you want to get the updated item
     };
