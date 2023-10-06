@@ -105,10 +105,17 @@ const createEmployee = async (event) => {
 const updateEmployee = async (event) => {
   const response = { statusCode: 200 };
   try {
+    const postId = event.pathParameters.postId;
+
+    // Check if postId is provided
+    if (!postId) {
+      throw new Error('postId is missing in path parameters.');
+    }
+
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
     const bankDetails = body.bankDetails;
-    
+
     // Perform validation on bankDetails
     const validationError = validation(bankDetails);
     if (validationError) {
@@ -123,27 +130,22 @@ const updateEmployee = async (event) => {
     // Fetch an item from DynamoDB based on postId
     const employeeData = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: body.postId }),
+      Key: marshall({ postId: postId }),
     };
     const { Item } = await db.send(new GetItemCommand(employeeData));
-    
-    // Check if an item with the same postId exists in DynamoDB
-    if (Item) {
-      const item1 = { item2: Item ? unmarshall(Item) : {} };
-      console.log(item1);
 
-      // Check if bankDetails already exist in the fetched item
-      if (item1.item2.bankDetails) {
-        throw new Error("BankDetails already exists!");
-      }
+    // Check if an item with the same postId exists in DynamoDB
+    if (!Item) {
+      throw new Error(`Item with postId ${postId} not found.`);
     }
 
-    // Define parameters for inserting an item into DynamoDB
+    // Define parameters for updating an item in DynamoDB
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Item: marshall({
-        postId: body.postId,
-        bankDetails: {
+      Key: marshall({ postId: postId }),
+      UpdateExpression: 'SET bankDetails = :bankDetails',
+      ExpressionAttributeValues: {
+        ':bankDetails': marshall({
           BankName: bankDetails.BankName,
           BranchName: bankDetails.BranchName,
           BranchAddress: bankDetails.BranchAddress,
@@ -152,19 +154,19 @@ const updateEmployee = async (event) => {
           IsSalaryAccount: bankDetails.IsSalaryAccount,
           IsActive: bankDetails.IsActive,
           IsDeleted: bankDetails.IsDeleted,
-        },
-      }, { removeUndefinedValues: true }),
+        }, { removeUndefinedValues: true }),
+      },
     };
 
-    // Insert the item into DynamoDB
-    await db.send(new PutItemCommand(params));
+    // Update the item in DynamoDB
+    await db.send(new UpdateItemCommand(params));
     response.body = JSON.stringify({
-      message: 'Successfully created post.',
+      message: 'Successfully updated post.',
     });
   } catch (e) {
     console.error(e);
     response.body = JSON.stringify({
-      message: 'Failed to create post.',
+      message: 'Failed to update post.',
       errorMsg: e.message,
       errorStack: e.stack,
     });
