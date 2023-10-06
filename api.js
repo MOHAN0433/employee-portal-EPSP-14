@@ -142,7 +142,14 @@ const updateEmployee = async (event) => {
     // Merge the existing bankDetails with the new data, preserving any additional properties
     const updatedBankDetails = {
       ...unmarshall(Item.bankDetails), // Get existing data
-      ...bankDetails, // Merge with new data
+      BankName: { S: bankDetails.BankName }, // Ensure BankName is of String type
+      BranchName: { S: bankDetails.BranchName }, // Ensure BranchName is of String type
+      BranchAddress: { S: bankDetails.BranchAddress }, // Ensure BranchAddress is of String type
+      CustomerNumber: { S: bankDetails.CustomerNumber }, // Ensure CustomerNumber is of String type
+      BankAccountNumber: { S: bankDetails.BankAccountNumber }, // Ensure BankAccountNumber is of String type
+      IsSalaryAccount: { BOOL: bankDetails.IsSalaryAccount === 'yes' }, // Convert to Boolean
+      IsActive: { BOOL: bankDetails.IsActive === 'yes' }, // Convert to Boolean
+      IsDeleted: { BOOL: bankDetails.IsDeleted === 'true' }, // Convert to Boolean
     };
 
     // Define parameters for updating an item in DynamoDB
@@ -151,7 +158,7 @@ const updateEmployee = async (event) => {
       Key: marshall({ postId: postId }),
       UpdateExpression: 'SET bankDetails = :bankDetails',
       ExpressionAttributeValues: {
-        ':bankDetails': marshall(updatedBankDetails, { removeUndefinedValues: true }),
+        ':bankDetails': updatedBankDetails,
       },
       ReturnValues: 'ALL_NEW', // Optionally, you can specify this if you want to get the updated item
     };
@@ -178,6 +185,7 @@ const updateEmployee = async (event) => {
   }
   return response;
 };
+
 
 
 // Export the createEmployee and updateEmployee functions
