@@ -2,8 +2,6 @@ const { expect } = require('chai');
 const { createEmployee, updateEmployee } = require('./api');
 const {
   DynamoDBClient,
-  PutItemCommand,
-  UpdateItemCommand,
 } = require('@aws-sdk/client-dynamodb');
 const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
 
