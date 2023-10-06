@@ -107,55 +107,71 @@ const updateEmployee = async (event) => {
   try {
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
-    const objKeys = Object.keys(body);
+    const bankDetails = body.bankDetails;
     
     // Perform validation on bankDetails
-    const validationError = validation(body.bankDetails);
+    const validationError = validation(bankDetails);
     if (validationError) {
       throw new Error(validationError);
     }
 
-    // Define parameters for updating an item in DynamoDB
+    // Check for required fields in the body
+    if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
+      throw new Error('Required fields are missing.');
+    }
+
+    // Fetch an item from DynamoDB based on postId
+    const employeeData = {
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Key: marshall({ postId: body.postId }),
+    };
+    const { Item } = await db.send(new GetItemCommand(employeeData));
+    
+    // Check if an item with the same postId exists in DynamoDB
+    if (Item) {
+      const item1 = { item2: Item ? unmarshall(Item) : {} };
+      console.log(item1);
+
+      // Check if bankDetails already exist in the fetched item
+      if (item1.item2.bankDetails) {
+        throw new Error("BankDetails already exists!");
+      }
+    }
+
+    // Define parameters for inserting an item into DynamoDB
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: event.pathParameters.postId }),
-      UpdateExpression: `SET ${objKeys
-        .map((_, index) => `#key${index} = :value${index}`)
-        .join(', ')}`,
-      ExpressionAttributeNames: objKeys.reduce(
-        (acc, key, index) => ({
-          ...acc,
-          [`#key${index}`]: key,
-        }),
-        {}
-      ),
-      ExpressionAttributeValues: marshall(
-        objKeys.reduce(
-          (acc, key, index) => ({
-            ...acc,
-            [`:value${index}`]: body[key],
-          }),
-          {}
-        )
-      ),
+      Item: marshall({
+        postId: body.postId,
+        bankDetails: {
+          BankName: bankDetails.BankName,
+          BranchName: bankDetails.BranchName,
+          BranchAddress: bankDetails.BranchAddress,
+          CustomerNumber: bankDetails.CustomerNumber,
+          BankAccountNumber: bankDetails.BankAccountNumber,
+          IsSalaryAccount: bankDetails.IsSalaryAccount,
+          IsActive: bankDetails.IsActive,
+          IsDeleted: bankDetails.IsDeleted,
+        },
+      }, { removeUndefinedValues: true }),
     };
 
-    // Update the item in DynamoDB
-    const updateResult = await db.send(new UpdateItemCommand(params));
+    // Insert the item into DynamoDB
+    await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
-      message: 'Successfully updated BankDetails.',
-      updateResult,
+      message: 'Successfully created post.',
     });
   } catch (e) {
     console.error(e);
     response.body = JSON.stringify({
-      message: 'Failed to update BankDetails.',
+      message: 'Failed to create post.',
       errorMsg: e.message,
       errorStack: e.stack,
     });
   }
   return response;
 };
+
 
 // Export the createEmployee and updateEmployee functions
 module.exports = {
