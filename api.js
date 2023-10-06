@@ -39,10 +39,11 @@ const createEmployee = async (event) => {
     const bankDetails = body.bankDetails;
     
     // Perform validation on bankDetails
-    // const validationError = validation(bankDetails);
-    // if (validationError) {
-    //   throw new Error(validationError);
-    // }
+    const validationError = validation(bankDetails);
+    console.log(validationError);
+    if (validationError) {
+      throw new Error(validationError);
+    }
 
     // Check for required fields in the body
     if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
