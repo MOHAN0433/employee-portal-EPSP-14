@@ -105,88 +105,57 @@ const createEmployee = async (event) => {
 const updateEmployee = async (event) => {
   const response = { statusCode: 200 };
   try {
-    const postId = event.pathParameters.postId;
-
-    // Check if postId is provided
-    if (!postId) {
-      throw new Error('postId is missing in path parameters.');
-    }
-
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
-    const bankDetails = body.bankDetails;
-
+    const objKeys = Object.keys(body);
+    
     // Perform validation on bankDetails
-    const validationError = validation(bankDetails);
+    const validationError = validation(body.bankDetails);
     if (validationError) {
       throw new Error(validationError);
     }
 
-    // Check for required fields in the body
-    if (!bankDetails.BankName || !bankDetails.BranchName || !bankDetails.BranchAddress || !bankDetails.BankAccountNumber) {
-      throw new Error('Required fields are missing.');
-    }
-
-    // Fetch an item from DynamoDB based on postId
-    const employeeData = {
-      TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: postId }),
-    };
-    const { Item } = await db.send(new GetItemCommand(employeeData));
-
-    // Check if an item with the same postId exists in DynamoDB
-    if (!Item) {
-      throw new Error(`Item with postId ${postId} not found.`);
-    }
-
-    // Merge the existing bankDetails with the new data, preserving any additional properties
-    const updatedBankDetails = {
-      ...unmarshall(Item.bankDetails), // Get existing data
-      BankName: { S: bankDetails.BankName }, // Ensure BankName is of String type
-      BranchName: { S: bankDetails.BranchName }, // Ensure BranchName is of String type
-      BranchAddress: { S: bankDetails.BranchAddress }, // Ensure BranchAddress is of String type
-      CustomerNumber: { S: bankDetails.CustomerNumber }, // Ensure CustomerNumber is of String type
-      BankAccountNumber: { S: bankDetails.BankAccountNumber }, // Ensure BankAccountNumber is of String type
-      IsSalaryAccount: { BOOL: bankDetails.IsSalaryAccount === 'yes' }, // Convert to Boolean
-      IsActive: { BOOL: bankDetails.IsActive === 'yes' }, // Convert to Boolean
-      IsDeleted: { BOOL: bankDetails.IsDeleted === 'true' }, // Convert to Boolean
-    };
-
     // Define parameters for updating an item in DynamoDB
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: postId }),
-      UpdateExpression: 'SET bankDetails = :bankDetails',
-      ExpressionAttributeValues: {
-        ':bankDetails': updatedBankDetails,
-      },
-      ReturnValues: 'ALL_NEW', // Optionally, you can specify this if you want to get the updated item
+      Key: marshall({ postId: event.pathParameters.postId }),
+      UpdateExpression: `SET ${objKeys
+        .map((_, index) => `#key${index} = :value${index}`)
+        .join(', ')}`,
+      ExpressionAttributeNames: objKeys.reduce(
+        (acc, key, index) => ({
+          ...acc,
+          [`#key${index}`]: key,
+        }),
+        {}
+      ),
+      ExpressionAttributeValues: marshall(
+        objKeys.reduce(
+          (acc, key, index) => ({
+            ...acc,
+            [`:value${index}`]: body[key],
+          }),
+          {}
+        )
+      ),
     };
-    
+
     // Update the item in DynamoDB
-    const updatedItem = await db.send(new UpdateItemCommand(params));
-    
-    // Check if the item was successfully updated
-    if (!updatedItem || !updatedItem.Attributes) {
-      throw new Error('Failed to update the item.');
-    }
-    
+    const updateResult = await db.send(new UpdateItemCommand(params));
     response.body = JSON.stringify({
-      message: 'Successfully updated post.',
-      updatedItem: unmarshall(updatedItem.Attributes), // Optionally, you can return the updated item
+      message: 'Successfully updated BankDetails.',
+      updateResult,
     });
   } catch (e) {
     console.error(e);
     response.body = JSON.stringify({
-      message: 'Failed to update post.',
+      message: 'Failed to update BankDetails.',
       errorMsg: e.message,
       errorStack: e.stack,
     });
   }
   return response;
 };
-
-
 
 // Export the createEmployee and updateEmployee functions
 module.exports = {
