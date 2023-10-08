@@ -11,20 +11,20 @@ const CustomerNumberRegex = /^\d{11,12}$/;
 const BankAccountNumber = /^\d{11,16}$/;
 
 // Validation function for bankDetails object
-const validation = (bankDetails1) => {
-  if (!nameRegex.test(bankDetails1.BankName)) {
+const validation = (bankDetails) => {
+  if (!nameRegex.test(bankDetails.BankName)) {
     return "BankName should be minimum 3 characters!";
   }
-  if (!nameRegex.test(bankDetails1.BranchName)) {
+  if (!nameRegex.test(bankDetails.BranchName)) {
     return "BranchName should be minimum 3 characters!";
   }
-  if (!nameRegex.test(bankDetails1.BranchAddress)) {
+  if (!nameRegex.test(bankDetails.BranchAddress)) {
     return "BranchAddress should be minimum 3 characters!";
   }
-  if (!CustomerNumberRegex.test(bankDetails1.CustomerNumber)) {
+  if (!CustomerNumberRegex.test(bankDetails.CustomerNumber)) {
     return "CustomerNumber should be minimum 11 characters!";
   }
-  if (!BankAccountNumber.test(bankDetails1.BankAccountNumber)) {
+  if (!BankAccountNumber.test(bankDetails.BankAccountNumber)) {
     return "BankAccountNumber should be minimum 11 digits!";
   }
   //return null; // Validation passed
@@ -40,9 +40,10 @@ const createEmployee = async (event) => {
     console.log(bankDetails);
     
     // Perform validation on bankDetails
-    const error = validation(bankDetails);
-    if (error) {
-      throw new Error(error);
+    const validationError = validation(bankDetails);
+    if (validationError) {
+      console.log("CustomerNumber:", bankDetails.CustomerNumber);
+      throw new Error(validationError);
     }
 
     // Check for required fields in the body
@@ -102,8 +103,64 @@ const createEmployee = async (event) => {
   return response;
 };
 
+// Function to update an employee
+const updateEmployee = async (event) => {
+  const response = { statusCode: 200 };
+  try {
+    // Parse the JSON body from the event
+    const body = JSON.parse(event.body);
+    const objKeys = Object.keys(body);
+    
+    // Perform validation on bankDetails
+    const validationError = validation(body.bankDetails);
+    if (validationError) {
+      throw new Error(validationError);
+    }
+
+    // Define parameters for updating an item in DynamoDB
+    const params = {
+      TableName: process.env.DYNAMODB_TABLE_NAME,
+      Key: marshall({ postId: event.pathParameters.postId }),
+      UpdateExpression: `SET ${objKeys
+        .map((_, index) => `#key${index} = :value${index}`)
+        .join(', ')}`,
+      ExpressionAttributeNames: objKeys.reduce(
+        (acc, key, index) => ({
+          ...acc,
+          [`#key${index}`]: key,
+        }),
+        {}
+      ),
+      ExpressionAttributeValues: marshall(
+        objKeys.reduce(
+          (acc, key, index) => ({
+            ...acc,
+            [`:value${index}`]: body[key],
+          }),
+          {}
+        )
+      ),
+    };
+
+    // Update the item in DynamoDB
+    const updateResult = await db.send(new UpdateItemCommand(params));
+    response.body = JSON.stringify({
+      message: 'Successfully updated BankDetails.',
+      updateResult,
+    });
+  } catch (e) {
+    console.error(e);
+    response.body = JSON.stringify({
+      message: 'Failed to update BankDetails.',
+      errorMsg: e.message,
+      errorStack: e.stack,
+    });
+  }
+  return response;
+};
 
 // Export the createEmployee and updateEmployee functions
 module.exports = {
-  createEmployee
+  createEmployee,
+  updateEmployee
 };
