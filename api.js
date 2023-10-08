@@ -37,6 +37,7 @@ const createEmployee = async (event) => {
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
     const bankDetails = body.bankDetails;
+    console.log(bankDetails);
     
     // Perform validation on bankDetails
     const validationError = validation(bankDetails);
