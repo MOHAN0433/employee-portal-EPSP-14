@@ -145,4 +145,20 @@ describe('updateEmployee unit tests', () => {
     const responseBody = JSON.parse(response.body);
     expect(responseBody.errorMsg).to.equal('BankName should be minimum 3 characters!');
   });
+
+  it('fails to update an employee with missing data', async () => {
+    // Mock event object with missing data
+    let event = {
+      body: JSON.stringify({
+        bankDetails : {
+        // Invalid data that should fail validation
+        //BankName: 'AB', // Too short
+          
+        }
+      }),
+    };
+
+    const response = await updateEmployee(event);
+    expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for missing data
+  });
  });

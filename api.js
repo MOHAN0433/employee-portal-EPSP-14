@@ -160,25 +160,35 @@ const updateEmployee = async (event) => {
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Key: marshall({ postId: event.pathParameters.postId }),
-      UpdateExpression: `SET ${objKeys
-        .map((_, index) => `#key${index} = :value${index}`)
-        .join(", ")}`,
-      ExpressionAttributeNames: objKeys.reduce(
-        (acc, key, index) => ({
-          ...acc,
-          [`#key${index}`]: key,
-        }),
-        {}
-      ),
-      ExpressionAttributeValues: marshall(
-        objKeys.reduce(
-          (acc, key, index) => ({
-            ...acc,
-            [`:value${index}`]: body[key],
-          }),
-          {}
-        )
-      ),
+      UpdateExpression: `SET 
+        #BankName = :BankName,
+        #BranchName = :BranchName,
+        #BranchAddress = :BranchAddress,
+        #CustomerNumber = :CustomerNumber,
+        #BankAccountNumber = :BankAccountNumber,
+        #IsSalaryAccount = :IsSalaryAccount,
+        #IsActive = :IsActive,
+        #IsDeleted = :IsDeleted`,
+      ExpressionAttributeNames: {
+        "#BankName": "bankDetails.BankName",
+        "#BranchName": "bankDetails.BranchName",
+        "#BranchAddress": "bankDetails.BranchAddress",
+        "#CustomerNumber": "bankDetails.CustomerNumber",
+        "#BankAccountNumber": "bankDetails.BankAccountNumber",
+        "#IsSalaryAccount": "bankDetails.IsSalaryAccount",
+        "#IsActive": "bankDetails.IsActive",
+        "#IsDeleted": "bankDetails.IsDeleted",
+      },
+      ExpressionAttributeValues: marshall({
+        ":BankName": body.bankDetails.BankName,
+        ":BranchName": body.bankDetails.BranchName,
+        ":BranchAddress": body.bankDetails.BranchAddress,
+        ":CustomerNumber": body.bankDetails.CustomerNumber,
+        ":BankAccountNumber": body.bankDetails.BankAccountNumber,
+        ":IsSalaryAccount": body.bankDetails.IsSalaryAccount,
+        ":IsActive": body.bankDetails.IsActive,
+        ":IsDeleted": body.bankDetails.IsDeleted,
+      }, {removeUndefinedValues : true}),
     };
 
     // Update the item in DynamoDB
