@@ -49,10 +49,20 @@ const createEmployee = async (event) => {
       throw new Error(validationError);
     }
 
-    // Check for required fields in the body
-    // if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.BankAccountNumber) {
-    //   throw new Error('Required fields are missing.');
+    //Check for required fields in the body
+    // if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.CustomerNumber || !body.bankDetails.BankAccountNumber || !body.bankDetails.IsSalaryAccount || !body.bankDetails.IsActive || !body.bankDetails.IsDeleted) {
+    //   response.statusCode =400;
+    //   throw new Error('Required fields are missing!');
     // }
+
+    const requiredFields = ['BankName', 'BranchName', /* Add other required fields */];
+    for (const field of requiredFields) {
+      if (!body.bankDetails[field]) {
+        response.statusCode = 400;
+        throw new Error(`${field} is a mandatory field!`);
+      }
+    }
+    
 
     // Fetch an item from DynamoDB based on postId
     const employeeData = {
