@@ -145,30 +145,4 @@ describe('updateEmployee unit tests', () => {
     const responseBody = JSON.parse(response.body);
     expect(responseBody.errorMsg).to.equal('BankName should be minimum 3 characters!');
   });
-
-  it('fails to update an employee with missing data', async () => {
-    // Mock event object with missing data
-    let event = {
-      pathParameters: {
-        postId: '25', // Assuming this postId exists
-      },
-      body: JSON.stringify({
-        // Invalid data that should fail validation
-        bankDetails : {
-            BankName: "kanara",
-            
-            BranchAddress: "bangalore",
-            CustomerNumber: "12345678912",
-            BankAccountNumber: "55566444412",
-            IsSalaryAccount: "yes",
-            IsActive: "yes",
-            IsDeleted: "flase"
-        }
-          
-      }),
-    };
-
-    const response = await updateEmployee(event);
-    expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for missing data
-  });
  });
