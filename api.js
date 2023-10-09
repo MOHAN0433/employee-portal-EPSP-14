@@ -32,7 +32,7 @@ const validation = (bankDetails) => {
 
 // Function to create an employee
 const createEmployee = async (event) => {
-  const response = { statusCode: 200 };
+  let response = { statusCode: 200 };
   try {
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
@@ -42,11 +42,10 @@ const createEmployee = async (event) => {
     // Perform validation on bankDetails
     const validationError = validation(bankDetails);
     if (validationError) {
-      console.log("CustomerNumber:", bankDetails.CustomerNumber);
-      // response.statusCode =500;
-      // response.body=JSON.stringify({
-      //   message: "BankName should be minimum 3 characters!",
-      // })
+       response.statusCode =400;
+      response.body=JSON.stringify({
+        message: validationError,
+      })
       throw new Error(validationError);
     }
 
@@ -88,7 +87,7 @@ const createEmployee = async (event) => {
           IsActive: bankDetails.IsActive,
           IsDeleted: bankDetails.IsDeleted,
         },
-      }, { removeUndefinedValues: true }),
+      }),
           };
 
     // Insert the item into DynamoDB
@@ -99,6 +98,7 @@ const createEmployee = async (event) => {
     //To through the exception if anything failing while creating bankDetails
   } catch (e) {
     console.error(e);
+    //response.statusCode=500
     response.body = JSON.stringify({
       //message: 'Failed to create BankDetails',
       errorMsg: e.message,
@@ -119,6 +119,10 @@ const updateEmployee = async (event) => {
     // Perform validation on bankDetails
     const validationError = validation(body.bankDetails);
     if (validationError) {
+       response.statusCode =400;
+      response.body=JSON.stringify({
+        message: validationError,
+      })
       throw new Error(validationError);
     }
 
