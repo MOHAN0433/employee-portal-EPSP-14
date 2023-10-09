@@ -43,6 +43,10 @@ const createEmployee = async (event) => {
     const validationError = validation(bankDetails);
     if (validationError) {
       console.log("CustomerNumber:", bankDetails.CustomerNumber);
+      // response.statusCode =500;
+      // response.body=JSON.stringify({
+      //   message: "BankName should be minimum 3 characters!",
+      // })
       throw new Error(validationError);
     }
 
@@ -85,17 +89,18 @@ const createEmployee = async (event) => {
           IsDeleted: bankDetails.IsDeleted,
         },
       }, { removeUndefinedValues: true }),
-    };
+          };
 
     // Insert the item into DynamoDB
     await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
       message: 'Successfully created post.',
     });
+    //To through the exception if anything failing while creating bankDetails
   } catch (e) {
     console.error(e);
     response.body = JSON.stringify({
-      message: 'Failed to create post.',
+      //message: 'Failed to create BankDetails',
       errorMsg: e.message,
       errorStack: e.stack,
     });
