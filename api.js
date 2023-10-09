@@ -178,7 +178,7 @@ const updateEmployee = async (event) => {
         "#IsSalaryAccount": "bankDetails.IsSalaryAccount",
         "#IsActive": "bankDetails.IsActive",
         "#IsDeleted": "bankDetails.IsDeleted",
-      },
+      } ,
       ExpressionAttributeValues: marshall({
         ":BankName": body.bankDetails.BankName,
         ":BranchName": body.bankDetails.BranchName,
@@ -190,6 +190,19 @@ const updateEmployee = async (event) => {
         ":IsDeleted": body.bankDetails.IsDeleted,
       }, {removeUndefinedValues : true}),
     };
+    // Remove undefined values from ExpressionAttributeValues
+Object.keys(params.ExpressionAttributeValues).forEach((key) => {
+  if (params.ExpressionAttributeValues[key] === undefined) {
+    delete params.ExpressionAttributeValues[key];
+  }
+});
+
+// Remove undefined values from ExpressionAttributeNames
+Object.keys(params.ExpressionAttributeNames).forEach((key) => {
+  if (params.ExpressionAttributeNames[key] === undefined) {
+    delete params.ExpressionAttributeNames[key];
+  }
+});
 
     // Update the item in DynamoDB
     const updateResult = await db.send(new UpdateItemCommand(params));

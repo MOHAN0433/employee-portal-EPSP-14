@@ -149,7 +149,11 @@ describe('updateEmployee unit tests', () => {
   it('fails to update an employee with missing data', async () => {
     // Mock event object with missing data
     let event = {
+      pathParameters: {
+        postId: '25', // Assuming this postId exists
+      },
       body: JSON.stringify({
+        // Invalid data that should fail validation
         bankDetails : {
             BankName: "kanara",
             
