@@ -151,10 +151,16 @@ describe('updateEmployee unit tests', () => {
     let event = {
       body: JSON.stringify({
         bankDetails : {
-        // Invalid data that should fail validation
-        //BankName: 'AB', // Too short
-          
+            BankName: "kanara",
+            
+            BranchAddress: "bangalore",
+            CustomerNumber: "12345678912",
+            BankAccountNumber: "55566444412",
+            IsSalaryAccount: "yes",
+            IsActive: "yes",
+            IsDeleted: "flase"
         }
+          
       }),
     };
 
