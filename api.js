@@ -50,17 +50,16 @@ const createEmployee = async (event) => {
     }
 
     //Check for required fields in the body
-    // if (!body.bankDetails.BankName || !body.bankDetails.BranchName || !body.bankDetails.BranchAddress || !body.bankDetails.CustomerNumber || !body.bankDetails.BankAccountNumber || !body.bankDetails.IsSalaryAccount || !body.bankDetails.IsActive || !body.bankDetails.IsDeleted) {
-    //   response.statusCode =400;
-    //   throw new Error('Required fields are missing!');
-    // }
-
-    const requiredFields = ['BankName', 'BranchName', /* Add other required fields */];
+    const requiredFields = ['BankName', 'BranchName','BranchAddress', 'CustomerNumber', 'BankAccountNumber', 'IsSalaryAccount', 'IsActive', 'IsDeleted'];
     for (const field of requiredFields) {
       if (!body.bankDetails[field]) {
         response.statusCode = 400;
         throw new Error(`${field} is a mandatory field!`);
       }
+    }
+    if(!body.postId) {
+      response.statusCode=400;
+      throw new Error('postId is a mandatory field!');
     }
     
 
@@ -103,7 +102,7 @@ const createEmployee = async (event) => {
     // Insert the item into DynamoDB
     await db.send(new PutItemCommand(params));
     response.body = JSON.stringify({
-      message: 'Successfully created post.',
+      message: 'Successfully created BankDetails!',
     });
     //To through the exception if anything failing while creating bankDetails
   } catch (e) {

@@ -62,13 +62,19 @@ describe('createEmployee unit tests', () => {
     expect(response.statusCode).to.equal(200);
     const responseBody = JSON.parse(response.body);
     console.log(responseBody.message);
-    expect(responseBody.message).to.equal('Successfully created post.');
+    expect(responseBody.message).to.equal('Successfully created BankDetails!');
   });
 
   it('fails to create an employee with missing data', async () => {
     // Mock event object with missing data
     let event = {
-      body: JSON.stringify({}), // Missing required data
+      body: JSON.stringify({
+        bankDetails : {
+        // Invalid data that should fail validation
+        //BankName: 'AB', // Too short
+          
+        }
+      }),
     };
 
     const response = await createEmployee(event);
