@@ -160,49 +160,26 @@ const updateEmployee = async (event) => {
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Key: marshall({ postId: event.pathParameters.postId }),
-      UpdateExpression: `SET 
-        #BankName = :BankName,
-        #BranchName = :BranchName,
-        #BranchAddress = :BranchAddress,
-        #CustomerNumber = :CustomerNumber,
-        #BankAccountNumber = :BankAccountNumber,
-        #IsSalaryAccount = :IsSalaryAccount,
-        #IsActive = :IsActive,
-        #IsDeleted = :IsDeleted`,
-      ExpressionAttributeNames: {
-        "#BankName": "bankDetails.BankName",
-        "#BranchName": "bankDetails.BranchName",
-        "#BranchAddress": "bankDetails.BranchAddress",
-        "#CustomerNumber": "bankDetails.CustomerNumber",
-        "#BankAccountNumber": "bankDetails.BankAccountNumber",
-        "#IsSalaryAccount": "bankDetails.IsSalaryAccount",
-        "#IsActive": "bankDetails.IsActive",
-        "#IsDeleted": "bankDetails.IsDeleted",
-      } ,
-      ExpressionAttributeValues: marshall({
-        ":BankName": body.bankDetails.BankName,
-        ":BranchName": body.bankDetails.BranchName,
-        ":BranchAddress": body.bankDetails.BranchAddress,
-        ":CustomerNumber": body.bankDetails.CustomerNumber,
-        ":BankAccountNumber": body.bankDetails.BankAccountNumber,
-        ":IsSalaryAccount": body.bankDetails.IsSalaryAccount,
-        ":IsActive": body.bankDetails.IsActive,
-        ":IsDeleted": body.bankDetails.IsDeleted,
-      }, {removeUndefinedValues : true}),
+      UpdateExpression: `SET ${objKeys
+        .map((_, index) => `#key${index} = :value${index}`)
+        .join(", ")}`,
+      ExpressionAttributeNames: objKeys.reduce(
+        (acc, key, index) => ({
+          ...acc,
+          [`#key${index}`]: key,
+        }),
+        {}
+      ),
+      ExpressionAttributeValues: marshall(
+        objKeys.reduce(
+          (acc, key, index) => ({
+            ...acc,
+            [`:value${index}`]: body[key],
+          }),
+          {}
+        )
+      ),
     };
-    // Remove undefined values from ExpressionAttributeValues
-Object.keys(params.ExpressionAttributeValues).forEach((key) => {
-  if (params.ExpressionAttributeValues[key] === undefined) {
-    delete params.ExpressionAttributeValues[key];
-  }
-});
-
-// Remove undefined values from ExpressionAttributeNames
-Object.keys(params.ExpressionAttributeNames).forEach((key) => {
-  if (params.ExpressionAttributeNames[key] === undefined) {
-    delete params.ExpressionAttributeNames[key];
-  }
-});
 
     // Update the item in DynamoDB
     const updateResult = await db.send(new UpdateItemCommand(params));
