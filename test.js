@@ -52,7 +52,7 @@ describe('createEmployee unit tests', () => {
     DynamoDBClient.prototype.send = originalDynamoDBClient.prototype.send;
   });
 
-  it('successfully create an employee', async () => {
+  it('successfully create BankDetails', async () => {
     // Mock event object with employee data
     let event = {
       body: JSON.stringify(createEmployeeData),

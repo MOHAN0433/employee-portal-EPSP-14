@@ -156,29 +156,6 @@ const updateEmployee = async (event) => {
       throw new Error(validationError);
     }
 
-    if (!body.postId) {
-      response.statusCode = 400;
-      throw new Error("postId is a mandatory field!");
-    }
-
-    // Fetch an item from DynamoDB based on postId
-    const employeeData = {
-      TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: body.postId }),
-    };
-    const { Item } = await db.send(new GetItemCommand(employeeData));
-
-    // Check if an item with the same postId exists in DynamoDB
-    if (Item) {
-      const item1 = { item2: Item ? unmarshall(Item) : {} };
-      console.log(item1);
-
-      // Check if bankDetails already exist in the fetched item
-      if (!item1.item2.bankDetails) {
-        throw new Error("BankDetails already exists!");
-      }
-    }
-
     // Define parameters for updating an item in DynamoDB
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
