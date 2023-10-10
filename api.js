@@ -85,26 +85,27 @@ const createEmployee = async (event) => {
     }
 
     // Fetch an item from DynamoDB based on postId
-    const employeeData = {
-      TableName: process.env.DYNAMODB_TABLE_NAME,
-      Key: marshall({ postId: body.postId }),
-    };
-    const { Item } = await db.send(new GetItemCommand(employeeData));
+    // const employeeData = {
+    //   TableName: process.env.DYNAMODB_TABLE_NAME,
+    //   Key: marshall({ postId: body.postId }),
+    // };
+    // const { Item } = await db.send(new GetItemCommand(employeeData));
 
-    // Check if an item with the same postId exists in DynamoDB
-    if (Item) {
-      const item1 = { item2: Item ? unmarshall(Item) : {} };
-      console.log(item1);
+    // // Check if an item with the same postId exists in DynamoDB
+    // if (Item) {
+    //   const item1 = { item2: Item ? unmarshall(Item) : {} };
+    //   console.log(item1);
 
-      // Check if bankDetails already exist in the fetched item
-      if (item1.item2.bankDetails) {
-        throw new Error("BankDetails already exists!");
-      }
-    }
+    //   // Check if bankDetails already exist in the fetched item
+    //   if (item1.item2.bankDetails) {
+    //     throw new Error("BankDetails already exists!");
+    //   }
+    // }
 
     // Define parameters for inserting an item into DynamoDB
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
+      ConditionExpression: 'attribute_not_exists(postId)',
       Item: marshall({
         postId: body.postId,
         bankDetails: {
@@ -125,15 +126,32 @@ const createEmployee = async (event) => {
     response.body = JSON.stringify({
       message: "Successfully created BankDetails!",
     });
-    //To through the exception if anything failing while creating bankDetails
-  } catch (e) {
+    // To through the exception if anything failing while creating bankDetails
+  } //catch (e) {
+  //   console.error(e);
+  //   //response.statusCode=500
+  //   response.body = JSON.stringify({
+  //     //message: 'Failed to create BankDetails',
+  //     errorMsg: e.message,
+  //     errorStack: e.stack,
+  //   });
+  // }
+  catch (e) {
     console.error(e);
-    //response.statusCode=500
+    if (e.name === "ConditionalCheckFailedException") {
+      response.statusCode = 400;
+      response.body = JSON.stringify({
+        message: "Update condition failed. The item may not exist.",
+        errorMsg: e.message,
+      });
+    } else {
+      console.error(e);
     response.body = JSON.stringify({
-      //message: 'Failed to create BankDetails',
+      message: "Failed to update BankDetails.",
       errorMsg: e.message,
       errorStack: e.stack,
-    });
+      });
+    }
   }
   return response;
 };
