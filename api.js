@@ -47,7 +47,7 @@ const createEmployee = async (event) => {
   let response = { statusCode: 200 };
   const endpoint = event.path;
     switch (endpoint) {
-      case `employee/bankDetails/${empId}`:
+      case `employee/bankDetails/${postId}`:
   try {
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
@@ -208,6 +208,5 @@ case `employee/bankDetails/${postId}`:
 // Export the createEmployee and updateEmployee functions
 module.exports = {
   createEmployee,
-  updateEmployee,
 };
 
