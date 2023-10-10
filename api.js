@@ -189,13 +189,22 @@ const updateEmployee = async (event) => {
       message: "Successfully updated BankDetails.",
       updateResult,
     });
-  } catch (e) {
+  }  catch (e) {
     console.error(e);
+    if (e.name === "ConditionalCheckFailedException") {
+      response.statusCode = 400;
+      response.body = JSON.stringify({
+        message: "Update condition failed. The item may not exist.",
+        errorMsg: e.message,
+      });
+    } else {
+      console.error(e);
     response.body = JSON.stringify({
       message: "Failed to update BankDetails.",
       errorMsg: e.message,
       errorStack: e.stack,
-    });
+      });
+    }
   }
   return response;
 };
