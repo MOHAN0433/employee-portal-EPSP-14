@@ -2,7 +2,6 @@
 const {
   DynamoDBClient,
   PutItemCommand,
-  GetItemCommand,
   UpdateItemCommand,
 } = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
@@ -73,39 +72,24 @@ const createEmployee = async (event) => {
       "IsActive",
       "IsDeleted",
     ];
+    //Iterate bankDetails to check mandatory fields
     for (const field of requiredBankDetails) {
       if (!body.bankDetails[field]) {
         response.statusCode = 400;
         throw new Error(`${field} is a mandatory field!`);
       }
     }
+    //PostId should be given mandatory
     if (!body.postId) {
       response.statusCode = 400;
       throw new Error("postId is a mandatory field!");
     }
 
-    // Fetch an item from DynamoDB based on postId
-    // const employeeData = {
-    //   TableName: process.env.DYNAMODB_TABLE_NAME,
-    //   Key: marshall({ postId: body.postId }),
-    // };
-    // const { Item } = await db.send(new GetItemCommand(employeeData));
-
-    // // Check if an item with the same postId exists in DynamoDB
-    // if (Item) {
-    //   const item1 = { item2: Item ? unmarshall(Item) : {} };
-    //   console.log(item1);
-
-    //   // Check if bankDetails already exist in the fetched item
-    //   if (item1.item2.bankDetails) {
-    //     throw new Error("BankDetails already exists!");
-    //   }
-    // }
-
     // Define parameters for inserting an item into DynamoDB
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
-      ConditionExpression: 'attribute_not_exists(postId)',
+      //add the below line in params to validate post method to restrict duplicate posts
+      ConditionExpression: "attribute_not_exists(postId)",
       Item: marshall({
         postId: body.postId,
         bankDetails: {
@@ -126,30 +110,21 @@ const createEmployee = async (event) => {
     response.body = JSON.stringify({
       message: "Successfully created BankDetails!",
     });
+  } catch (e) {
     // To through the exception if anything failing while creating bankDetails
-  } //catch (e) {
-  //   console.error(e);
-  //   //response.statusCode=500
-  //   response.body = JSON.stringify({
-  //     //message: 'Failed to create BankDetails',
-  //     errorMsg: e.message,
-  //     errorStack: e.stack,
-  //   });
-  // }
-  catch (e) {
     console.error(e);
     if (e.name === "ConditionalCheckFailedException") {
       response.statusCode = 400;
       response.body = JSON.stringify({
-        message: "Update condition failed. The item may not exist.",
+        message: "BankDetails Already Exists!",
         errorMsg: e.message,
       });
     } else {
       console.error(e);
-    response.body = JSON.stringify({
-      message: "Failed to update BankDetails.",
-      errorMsg: e.message,
-      errorStack: e.stack,
+      response.body = JSON.stringify({
+        message: "Failed to update BankDetails.",
+        errorMsg: e.message,
+        errorStack: e.stack,
       });
     }
   }
@@ -179,7 +154,7 @@ const updateEmployee = async (event) => {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Key: marshall({ postId: event.pathParameters.postId }),
       //add the below line in params to validate and restrict the put method (updates only if the attribute exists)
-      ConditionExpression: 'attribute_exists(postId)',
+      ConditionExpression: "attribute_exists(postId)",
       UpdateExpression: `SET ${objKeys
         .map((_, index) => `#key${index} = :value${index}`)
         .join(", ")}`,
@@ -207,20 +182,20 @@ const updateEmployee = async (event) => {
       message: "Successfully updated BankDetails.",
       updateResult,
     });
-  }  catch (e) {
+  } catch (e) {
     console.error(e);
     if (e.name === "ConditionalCheckFailedException") {
       response.statusCode = 400;
       response.body = JSON.stringify({
-        message: "Update condition failed. The item may not exist.",
+        message: "BankDetails not found!",
         errorMsg: e.message,
       });
     } else {
       console.error(e);
-    response.body = JSON.stringify({
-      message: "Failed to update BankDetails.",
-      errorMsg: e.message,
-      errorStack: e.stack,
+      response.body = JSON.stringify({
+        message: "Failed to update BankDetails.",
+        errorMsg: e.message,
+        errorStack: e.stack,
       });
     }
   }
