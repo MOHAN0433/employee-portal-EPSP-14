@@ -47,7 +47,7 @@ const createEmployee = async (event) => {
   let response = { statusCode: 200 };
   const endpoint = event.path;
     switch (endpoint) {
-      case `employee/bankDetails/${postId}`:
+      case `employee/bankDetails`:
   try {
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
