@@ -160,6 +160,7 @@ const updateEmployee = async (event) => {
     const params = {
       TableName: process.env.DYNAMODB_TABLE_NAME,
       Key: marshall({ postId: event.pathParameters.postId }),
+      ConditionExpression: 'attribute_exists(#postId)',
       UpdateExpression: `SET ${objKeys
         .map((_, index) => `#key${index} = :value${index}`)
         .join(", ")}`,
