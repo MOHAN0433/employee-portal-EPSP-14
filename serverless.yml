@@ -23,27 +23,16 @@ functions:
       - http:
           path: employee/bankDetails
           method: POST
-    iamRoleStatements:
-      - Effect: "Allow"
-        Action:
-          - "dynamodb:PutItem"
-          - "dynamodb:GetItem"
-        Resource: !GetAtt employee.Arn
-  updateEmployee:
-    handler: api.updateEmployee
-    name: update-employee-bank-details-post
-    memorySize: 128 # mb
-    timeout: 5 # seconds
-    events:
       - http:
           path: employee/bankDetails/{postId}
           method: PUT
     iamRoleStatements:
       - Effect: "Allow"
         Action:
+          - "dynamodb:PutItem"
           - "dynamodb:UpdateItem"
-          - "dynamodb:GetItem"
         Resource: !GetAtt employee.Arn
+  
 # aws resource that is dynamodb
 resources:
   Resources:
