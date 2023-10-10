@@ -46,6 +46,7 @@ const validation = (bankDetails) => {
 const createEmployee = async (event) => {
   let response = { statusCode: 200 };
   const endpoint = event.path;
+  const postId = event.pathParameters.postId;
     switch (endpoint) {
       case `employee/bankDetails`:
   try {
@@ -201,6 +202,7 @@ case `employee/bankDetails/${postId}`:
       });
     }
   }
+  break;
 }
   return response;
 };
