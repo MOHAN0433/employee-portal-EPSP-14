@@ -45,9 +45,8 @@ const validation = (bankDetails) => {
 // Function to create an employee
 const createEmployee = async (event) => {
   let response = { statusCode: 200 };
-  const endpoint = event.path;
-  const postId = event.pathParameters.postId;
-    switch (endpoint) {
+  const resource = event.resource;
+    switch (resource) {
       case `/employee/bankDetails`:
   try {
     // Parse the JSON body from the event
@@ -132,11 +131,10 @@ const createEmployee = async (event) => {
       });
     }
   }
-
 break;
+
 // Function to update an employee
-case `/employee/bankDetails/${postId}`:
-  //const response = { statusCode: 200 };
+case `/employee/bankDetails/{postId}`:
   try {
     // Parse the JSON body from the event
     const body = JSON.parse(event.body);
