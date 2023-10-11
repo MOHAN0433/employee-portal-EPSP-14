@@ -24,7 +24,7 @@ functions:
           path: employee/bankDetails
           method: POST
       - http:
-          path: employee/bankDetails/{postId}
+          path: employee/bankDetails/{empId}
           method: PUT
     iamRoleStatements:
       - Effect: "Allow"
