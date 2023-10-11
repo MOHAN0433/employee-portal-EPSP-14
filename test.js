@@ -3,7 +3,7 @@ const { createEmployee, updateEmployee } = require('./api'); // Import both crea
 const {
   DynamoDBClient,
 } = require('@aws-sdk/client-dynamodb');
-const { marshall, unmarshall } = require('@aws-sdk/util-dynamodb');
+
 
 // Mock DynamoDBClient to avoid making actual AWS calls
 const mockClient = {

@@ -9,7 +9,7 @@ provider:
     DYNAMODB_TABLE_NAME: ${self:custom.employee}
 # define a custom variable for dynamodb table name
 custom:
-  employee: employee-${self:provider.stage}
+  employee: employee-BankDetails-${self:provider.stage}
 plugins:
   - serverless-iam-roles-per-function
   # lambda function name and configuration
@@ -41,10 +41,10 @@ resources:
       Properties:
         TableName: ${self:custom.employee}
         AttributeDefinitions:
-          - AttributeName: postId
+          - AttributeName: empId
             AttributeType: S
         KeySchema:
-          - AttributeName: postId
+          - AttributeName: empId
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
