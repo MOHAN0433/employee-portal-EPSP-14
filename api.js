@@ -194,7 +194,7 @@ const BankDeatilsHandler = async (event) => {
         } else {
           console.error(e);
           response.body = JSON.stringify({
-            message: "Failed to update BankDetails.",
+            message: "Failed to update BankDetails!",
             errorMsg: e.message,
             errorStack: e.stack,
           });
