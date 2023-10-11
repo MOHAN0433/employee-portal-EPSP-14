@@ -43,7 +43,7 @@ const validation = (bankDetails) => {
 };
 
 // Function to create an employee
-const createEmployee = async (event) => {
+const BankDeatilsHandler = async (event) => {
   let response = { statusCode: 200 };
   const resource = event.resource;
   switch (resource) {
@@ -207,5 +207,5 @@ const createEmployee = async (event) => {
 
 // Export the createEmployee and updateEmployee functions
 module.exports = {
-  createEmployee,
+  BankDeatilsHandler,
 };

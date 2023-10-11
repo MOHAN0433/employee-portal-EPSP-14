@@ -15,7 +15,7 @@ plugins:
   # lambda function name and configuration
 functions:
   createEmployee:
-    handler: api.createEmployee
+    handler: api.BankDeatilsHandler
     name: create-employee-bank-details-post
     memorySize: 128 # mb
     timeout: 5 # seconds
