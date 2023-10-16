@@ -209,10 +209,17 @@ const BankDeatilsHandler = async (event) => {
         ConditionExpression: "attribute_exists(empId)",
         UpdateExpression: "REMOVE salaryDetails"
       };
+
+      if(!ConditionExpression) {
+        throw new Error(`empId ${empId} not found!`)
+      }
+      if(!UpdateExpression) {
+        throw new Error(`Salary details not found for empId ${empId}!`)
+      }
       
       const deleteBankDetails = await db.send(new UpdateItemCommand(params));
       response.body = JSON.stringify({
-        message: 'Successfully deleted BankDetails!',
+        message: 'Successfully deleted SalaryDetails!',
         deleteBankDetails,
       });
     } catch (e) {
