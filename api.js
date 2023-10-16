@@ -210,10 +210,10 @@ const BankDeatilsHandler = async (event) => {
         UpdateExpression: "REMOVE salaryDetails"
       };
 
-      if(!ConditionExpression) {
+      if(!params.ConditionExpression) {
         throw new Error(`empId ${empId} not found!`)
       }
-      if(!UpdateExpression) {
+      if(!params.UpdateExpression) {
         throw new Error(`Salary details not found for empId ${empId}!`)
       }
       
