@@ -3,6 +3,7 @@ const {
   DynamoDBClient,
   PutItemCommand,
   UpdateItemCommand,
+  DeleteItemCommand,
 } = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 
@@ -201,9 +202,41 @@ const BankDeatilsHandler = async (event) => {
         }
       }
       break;
+      case `/employee/salary/{empId}`:
+    try {
+      const params = {
+        TableName: process.env.DYNAMODB_TABLE_NAME,
+        Key: marshall({ empId: event.pathParameters.empId }),
+      };
+      const { Item } = await db.send(new GetItemCommand(empData));
+    const item1 = { item2: Item ? unmarshall(Item) : {} };
+
+
+    // Check if Salary  Info exists
+    const isSalaryExisting = item1.item2.salaryDetails;
+    if (!isSalaryExisting) {  //remove above line code
+      throw new Error("Salary Details already exists");
+    }
+      const deleteBankDetails = await db.send(new DeleteItemCommand(params));
+      response.body = JSON.stringify({
+        message: 'Successfully deleted BankDetails!',
+        deleteBankDetails,
+      });
+    } catch (e) {
+      console.error(e);
+      response.statusCode = 500;
+      response.body = JSON.stringify({
+        message: 'Failed to delete Salary!',
+        errorMsg: e.message,
+        errorStack: e.stack,
+      });
+    }
+    break;
   }
+      
   return response;
 };
+
 
 // Export the createEmployee and updateEmployee functions
 module.exports = {

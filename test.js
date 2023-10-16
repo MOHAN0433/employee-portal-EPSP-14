@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { createEmployee, updateEmployee } = require('./api'); // Import both createEmployee and updateEmployee
+const { BankDeatilsHandler } = require('./api'); // Import both createEmployee and updateEmployee
 const {
   DynamoDBClient,
 } = require('@aws-sdk/client-dynamodb');
@@ -11,8 +11,8 @@ const mockClient = {
 };
 
 // Mock employee data for createEmployee
-const createEmployeeData = {
-  postId: "25",
+const createEmployeeBankDetails = {
+  empId: "25",
   bankDetails: {
     BankName: "kanara",
     BranchName: "hydrabad",
@@ -26,10 +26,10 @@ const createEmployeeData = {
 };
 
 // Mock employee data for updateEmployee
-const updateEmployeeData = {
+const updateEmployeeBankDetails = {
   bankDetails: {
     BankName: "kanara",
-    BranchName: "hydrabad",
+    BranchName: "bangalore",
     BranchAddress: "bangalore",
     CustomerNumber: "12345678912",
     BankAccountNumber: "55566444412",
@@ -40,7 +40,7 @@ const updateEmployeeData = {
 };
 
 // Successfully create an employee
-describe('createEmployee unit tests', () => {
+describe('createEmployeeBankDetails unit tests', () => {
   let originalDynamoDBClient;
 
   before(() => {
@@ -55,11 +55,11 @@ describe('createEmployee unit tests', () => {
   it('successfully create BankDetails', async () => {
     // Mock event object with employee data
     let event = {
-      body: JSON.stringify(createEmployeeData),
+      body: JSON.stringify(createEmployeeBankDetails),
       resource: `/employee/bankDetails`, // Specify the resource
     };
 
-    const response = await createEmployee(event);
+    const response = await BankDeatilsHandler(event);
     expect(response.statusCode).to.equal(200);
     const responseBody = JSON.parse(response.body);
     console.log(responseBody.message);
@@ -78,7 +78,7 @@ describe('createEmployee unit tests', () => {
       resource: `/employee/bankDetails`, // Specify the resource
     };
 
-    const response = await createEmployee(event);
+    const response = await BankDeatilsHandler(event);
     expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for missing data
   });
 
@@ -91,10 +91,11 @@ describe('createEmployee unit tests', () => {
           BankName: 'AB', // Too short
         }
       }),
-      resource: `/employee/bankDetails`, // Specify the resource
+      // Specify the resource
+      resource: `/employee/bankDetails`,
     };
 
-    const response = await createEmployee(event);
+    const response = await BankDeatilsHandler(event);
     expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for invalid data
     const responseBody = JSON.parse(response.body);
     expect(responseBody.errorMsg).to.equal('BankName should be minimum 3 characters!');
@@ -118,13 +119,13 @@ describe('updateEmployee unit tests', () => {
     // Mock event object with the employee ID and updated data
     let event = {
       pathParameters: {
-        postId: '2', // Assuming this postId exists
+        empId: '2', // Assuming this empId exists
       },
-      body: JSON.stringify(updateEmployeeData),
-      resource: `/employee/bankDetails/{postId}`, // Specify the resource with postId
+      body: JSON.stringify(updateEmployeeBankDetails),
+      resource: `/employee/bankDetails/{empId}`, // Specify the resource with empId
     };
 
-    const response = await createEmployee(event);
+    const response = await BankDeatilsHandler(event);
     expect(response.statusCode).to.equal(200);
     const responseBody = JSON.parse(response.body);
     expect(responseBody.message).to.equal('Successfully updated BankDetails.'); // Update the message if necessary
@@ -134,7 +135,7 @@ describe('updateEmployee unit tests', () => {
     // Mock event object with invalid data
     let event = {
       pathParameters: {
-        postId: '25', // Assuming this postId exists
+        empId: '25', // Assuming this empId exists
       },
       body: JSON.stringify({
         // Invalid data that should fail validation
@@ -142,10 +143,10 @@ describe('updateEmployee unit tests', () => {
           BankName: 'a', // Too short
         }
       }),
-      resource: `/employee/bankDetails/{postId}`, // Specify the resource with postId
+      resource: `/employee/bankDetails/{empId}`, // Specify the resource with empId
     };
 
-    const response = await createEmployee(event);
+    const response = await BankDeatilsHandler(event);
     expect(response.statusCode).to.equal(400); // Expecting a 400 Bad Request for invalid data
     const responseBody = JSON.parse(response.body);
     expect(responseBody.errorMsg).to.equal('BankName should be minimum 3 characters!');

@@ -26,6 +26,9 @@ functions:
       - http:
           path: employee/bankDetails/{empId}
           method: PUT
+      - http:
+          path: employee/salary/{empId}
+          method: DELETE
     iamRoleStatements:
       - Effect: "Allow"
         Action:
