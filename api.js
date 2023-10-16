@@ -3,8 +3,6 @@ const {
   DynamoDBClient,
   PutItemCommand,
   UpdateItemCommand,
-  DeleteItemCommand,
-  GetItemCommand,
 } = require("@aws-sdk/client-dynamodb");
 const { marshall, unmarshall } = require("@aws-sdk/util-dynamodb");
 
@@ -208,17 +206,11 @@ const BankDeatilsHandler = async (event) => {
       const params = {
         TableName: process.env.DYNAMODB_TABLE_NAME,
         Key: marshall({ empId: event.pathParameters.empId }),
+        ConditionExpression: "attribute_exists(empId)",
+        UpdateExpression: "REMOVE salaryDetails"
       };
-      const { Item } = await db.send(new GetItemCommand(params));
-    const item1 = { item2: Item ? unmarshall(Item) : {} };
-
-
-    // Check if Salary  Info exists
-    const isSalaryExisting = item1.item2.salaryDetails;
-    if (!isSalaryExisting) {  //remove above line code
-      throw new Error("Salary Details already exists");
-    }
-      const deleteBankDetails = await db.send(new DeleteItemCommand(params));
+      
+      const deleteBankDetails = await db.send(new UpdateItemCommand(params));
       response.body = JSON.stringify({
         message: 'Successfully deleted BankDetails!',
         deleteBankDetails,
