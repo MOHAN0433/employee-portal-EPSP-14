@@ -209,7 +209,7 @@ const BankDeatilsHandler = async (event) => {
         TableName: process.env.DYNAMODB_TABLE_NAME,
         Key: marshall({ empId: event.pathParameters.empId }),
       };
-      const { Item } = await db.send(new GetItemCommand(empData));
+      const { Item } = await db.send(new GetItemCommand(params));
     const item1 = { item2: Item ? unmarshall(Item) : {} };
 
 
