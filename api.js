@@ -201,42 +201,45 @@ const BankDeatilsHandler = async (event) => {
         }
       }
       break;
-      case `/employee/salary/{empId}`:
-    try {
-      const params = {
-        TableName: process.env.DYNAMODB_TABLE_NAME,
-        Key: marshall({ empId: event.pathParameters.empId }),
-        ConditionExpression: "attribute_exists(empId)",
-        UpdateExpression: "REMOVE salaryDetails"
-      };
+    case `/employee/salary/{empId}`:
+      try {
+        const params = {
+          TableName: process.env.DYNAMODB_TABLE_NAME,
+          Key: marshall({ empId: event.pathParameters.empId }),
+          ConditionExpression:
+            "attribute_exists(empId) AND attribute_exists(salaryDetails)",
+          UpdateExpression: "REMOVE salaryDetails",
+        };
 
-      if(!params.ConditionExpression) {
-        throw new Error(`empId ${empId} not found!`)
+        const deleteSalaryDetails = await db.send(
+          new UpdateItemCommand(params)
+        );
+        response.body = JSON.stringify({
+          message: "Successfully deleted SalaryDetails!",
+          deleteSalaryDetails,
+        });
+      } catch (e) {
+        console.error(e);
+        if (e.name === "ConditionalCheckFailedException") {
+          response.statusCode = 400;
+          response.body = JSON.stringify({
+            message: "SalaryDetails not found!",
+            errorMsg: e.message,
+          });
+        } else {
+          response.statusCode = 500;
+          response.body = JSON.stringify({
+            message: "Failed to delete Salary!",
+            errorMsg: e.message,
+            errorStack: e.stack,
+          });
+        }
       }
-      if(!params.UpdateExpression) {
-        throw new Error(`Salary details not found for empId ${empId}!`)
-      }
-      
-      const deleteBankDetails = await db.send(new UpdateItemCommand(params));
-      response.body = JSON.stringify({
-        message: 'Successfully deleted SalaryDetails!',
-        deleteBankDetails,
-      });
-    } catch (e) {
-      console.error(e);
-      response.statusCode = 500;
-      response.body = JSON.stringify({
-        message: 'Failed to delete Salary!',
-        errorMsg: e.message,
-        errorStack: e.stack,
-      });
-    }
-    break;
+      break;
   }
-      
+
   return response;
 };
-
 
 // Export the createEmployee and updateEmployee functions
 module.exports = {
