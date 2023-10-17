@@ -236,6 +236,54 @@ const BankDeatilsHandler = async (event) => {
         }
       }
       break;
+
+      case '/softdelete/SalaryDetails/{empId}':
+            empId = event.pathParameters.empId;
+            const body = JSON.parse(event.body);
+            const isActiveStatus = body.SalaryDetails?.isActive;
+            console.log('isActiveStatus', isActiveStatus);
+            if (typeof isActiveStatus !== "boolean") { throw new Error('isActive attribute should be of boolean type!') };
+            try {
+                const softDeleteSalary = {
+                    TableName: process.env.DYNAMODB_TABLE_NAME,
+                    Key: marshall({ empId: empId }),
+                    ConditionExpression: 'attribute_exists(empId)',
+                    UpdateExpression: 'SET SalaryDetails.isActive = :isActive',
+                    ExpressionAttributeValues: marshall({
+                        ':isActive': isActiveStatus,
+                    })
+                };
+                //Await response from db when sent update Item command with required inputs
+                await db.send(new UpdateItemCommand(softDeleteSalary));
+                // Generate response message and data
+                if (isActiveStatus === false) {
+                    response.body = JSON.stringify({
+                        message: `Successfully soft deleted performance Information details of empId : ${empId}.`
+                    });
+                } else {
+                    response.body = JSON.stringify({
+                        message: `Successfully RESTORED soft deleted performance Information details of empId : ${empId}.`
+                    });
+                }
+            }
+            // Catch block to handle any server response errors
+            catch (e) {
+                console.error(e);
+                if (e.name === "ConditionalCheckFailedException") {
+                    response.statusCode = 400;
+                    response.body = JSON.stringify({
+                        message: `Employee Details not found for empId : ${empId}.`,
+                        errorMsg: e.message,
+                    });
+                } else {
+                    response.body = JSON.stringify({
+                        message: `Failed to soft delete employee performance Information details with empId : ${empId}.`,
+                        errorMsg: e.message,
+                        errorStack: e.stack,
+                    });
+                }
+            }
+            break;
   }
 
   return response;

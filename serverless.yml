@@ -29,6 +29,9 @@ functions:
       - http:
           path: employee/salary/{empId}
           method: DELETE
+      - http:
+          path: softdelete/SalaryDetails/{empId}
+          method: DELETE
     iamRoleStatements:
       - Effect: "Allow"
         Action:
